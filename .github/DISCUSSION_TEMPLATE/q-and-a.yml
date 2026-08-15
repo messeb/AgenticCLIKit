@@ -1,0 +1,14 @@
+title: "[Q&A] "
+labels: []
+body:
+  - type: textarea
+    id: question
+    attributes:
+      label: Your question
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: What have you tried so far?
+      description: Including `swift run agentickit health` output often answers the question outright.

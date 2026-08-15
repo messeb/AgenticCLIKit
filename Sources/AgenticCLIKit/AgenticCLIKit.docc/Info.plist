@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <!-- Pinned so `xcodebuild docbuild` does not derive an identifier from the
+         checkout's directory name, which fails when that name starts with a digit. -->
+    <key>CFBundleIdentifier</key>
+    <string>com.messeb.AgenticCLIKit</string>
+    <key>CFBundleName</key>
+    <string>AgenticCLIKit</string>
+    <key>CFBundleDisplayName</key>
+    <string>AgenticCLIKit</string>
+    <key>CFBundleDevelopmentRegion</key>
+    <string>en</string>
+</dict>
+</plist>

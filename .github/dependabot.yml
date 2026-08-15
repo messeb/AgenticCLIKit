@@ -1,0 +1,21 @@
+version: 2
+updates:
+  # The package itself has no third-party dependencies by design, but the
+  # workflows do — those are what needs watching.
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    labels:
+      - "dependencies"
+    reviewers:
+      - "messeb"
+
+  - package-ecosystem: "swift"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    labels:
+      - "dependencies"
+    reviewers:
+      - "messeb"

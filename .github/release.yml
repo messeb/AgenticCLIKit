@@ -1,0 +1,30 @@
+changelog:
+  exclude:
+    labels:
+      - ignore-for-release
+  categories:
+    - title: "🚨 Breaking Changes"
+      labels:
+        - breaking-change
+    - title: "✨ Features"
+      labels:
+        - enhancement
+        - feature
+    - title: "🐛 Fixes"
+      labels:
+        - bug
+        - fix
+    - title: "🔌 CLI Compatibility"
+      labels:
+        - compatibility
+    - title: "📖 Documentation"
+      labels:
+        - documentation
+    - title: "🔧 Maintenance"
+      labels:
+        - dependencies
+        - refactor
+        - chore
+    - title: "Other Changes"
+      labels:
+        - "*"

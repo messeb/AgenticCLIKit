@@ -1,0 +1,62 @@
+name: CI
+
+on:
+  push:
+    branches: [main, "release/**"]
+  pull_request:
+    branches: [main, "release/**"]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Build and test
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Select the newest installed Xcode
+        run: |
+          LATEST=$(ls -d /Applications/Xcode_*.app 2>/dev/null | sort -V | tail -1 || true)
+          if [[ -n "$LATEST" ]]; then sudo xcode-select -s "$LATEST"; fi
+          swift --version
+
+      # Warnings are failures: this package promises a clean, strict-concurrency
+      # build, and a warning here is usually a real concurrency or API problem.
+      - name: Build
+        run: |
+          set -o pipefail
+          swift build --build-tests 2>&1 | tee build.log
+          if grep -q "warning:" build.log; then
+            echo "::error::Build produced warnings"
+            grep "warning:" build.log
+            exit 1
+          fi
+
+      # No CLIs required: adapters run against committed transcripts.
+      - name: Test
+        run: swift test
+
+      - name: Release build
+        run: swift build -c release
+
+  documentation:
+    name: Documentation builds
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Select the newest installed Xcode
+        run: |
+          LATEST=$(ls -d /Applications/Xcode_*.app 2>/dev/null | sort -V | tail -1 || true)
+          if [[ -n "$LATEST" ]]; then sudo xcode-select -s "$LATEST"; fi
+
+      # Catches broken symbol links in doc comments before they reach the site.
+      - name: Build DocC archive
+        run: |
+          xcodebuild docbuild \
+            -scheme AgenticCLIKit \
+            -destination 'generic/platform=macOS' \
+            -derivedDataPath .docc-build

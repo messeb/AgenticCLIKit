@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Question or idea
+    url: https://github.com/messeb/AgenticCLIKit/discussions
+    about: Use Discussions for questions, ideas, and usage help.
+  - name: Security vulnerability
+    url: https://github.com/messeb/AgenticCLIKit/security/advisories/new
+    about: Report security issues privately, never as a public issue.

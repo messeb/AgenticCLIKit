@@ -1,0 +1,45 @@
+name: CLI Compatibility Drift
+description: A supported CLI changed its flags, output, or behaviour
+title: "[Compatibility]: "
+labels: ["compatibility", "bug"]
+body:
+  - type: markdown
+    attributes:
+      value: CLI churn is the main maintenance risk for this package. Thanks for flagging it.
+
+  - type: dropdown
+    id: cli
+    attributes:
+      label: Which CLI changed?
+      options:
+        - Claude Code (claude)
+        - Codex (codex)
+        - GitHub (gh)
+        - Antigravity (agy)
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: CLI version
+      description: Output of `<cli> --version`
+    validations:
+      required: true
+
+  - type: textarea
+    id: change
+    attributes:
+      label: What changed
+      description: A renamed flag, a new output field, a different exit code, …
+    validations:
+      required: true
+
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence
+      description: Relevant `--help` output or raw CLI output showing the new behaviour.
+      render: text
+    validations:
+      required: true

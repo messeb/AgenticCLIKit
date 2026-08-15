@@ -1,0 +1,12 @@
+title: "[Announcement] "
+labels: []
+body:
+  - type: markdown
+    attributes:
+      value: Releases, breaking changes, and CLI compatibility news.
+  - type: textarea
+    id: announcement
+    attributes:
+      label: Announcement
+    validations:
+      required: true

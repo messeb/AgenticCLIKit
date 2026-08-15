@@ -1,0 +1,129 @@
+name: Release
+
+# Step two of the manual release. Promotes a prepared `release/x.y.z` branch to
+# the real `x.y.z` tag and release, then opens a pull request back to `main` so
+# the version stamp and changelog land on the only long-lived branch.
+#
+# The rc tag is left in place: it is the record of what was tested.
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to release, without a leading v (e.g. 1.2.0)"
+        required: true
+        type: string
+      latest:
+        description: "Mark this as the repository's latest release"
+        required: false
+        default: true
+        type: boolean
+
+concurrency:
+  group: release-${{ inputs.version }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  release:
+    name: Release ${{ inputs.version }}
+    runs-on: macos-15
+    steps:
+      - name: Validate version
+        run: |
+          if [[ ! "${{ inputs.version }}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::'${{ inputs.version }}' is not a x.y.z version"
+            exit 1
+          fi
+
+      - uses: actions/checkout@v4
+        with:
+          ref: release/${{ inputs.version }}
+          fetch-depth: 0
+
+      - name: Verify the release branch was prepared
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if ! grep -q "public static let version = \"${{ inputs.version }}\"" \
+              Sources/AgenticCLIKit/Version.swift; then
+            echo "::error::release/${{ inputs.version }} is not stamped with ${{ inputs.version }}."
+            echo "::error::Run the Prepare Release workflow first."
+            exit 1
+          fi
+          if gh release view "${{ inputs.version }}" >/dev/null 2>&1; then
+            echo "::error::${{ inputs.version }} has already been released."
+            exit 1
+          fi
+
+      - name: Select the newest installed Xcode
+        run: |
+          LATEST=$(ls -d /Applications/Xcode_*.app 2>/dev/null | sort -V | tail -1 || true)
+          if [[ -n "$LATEST" ]]; then sudo xcode-select -s "$LATEST"; fi
+          swift --version
+
+      - name: Build and test
+        run: |
+          set -o pipefail
+          swift build --build-tests 2>&1 | tee build.log
+          if grep -q "warning:" build.log; then
+            echo "::error::Build produced warnings"
+            grep "warning:" build.log
+            exit 1
+          fi
+          swift test
+
+      - name: Publish the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BRANCH: release/${{ inputs.version }}
+        run: |
+          gh release create "${{ inputs.version }}" \
+            --target "$BRANCH" \
+            --title "${{ inputs.version }}" \
+            --latest=${{ inputs.latest }} \
+            --generate-notes \
+            --notes "\`\`\`swift
+          .package(url: \"https://github.com/messeb/AgenticCLIKit.git\", from: \"${{ inputs.version }}\")
+          \`\`\`"
+
+      - name: Open the pull request to main
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BRANCH: release/${{ inputs.version }}
+        run: |
+          EXISTING=$(gh pr list --head "$BRANCH" --base main --state open --json number --jq '.[0].number // empty')
+          if [[ -n "$EXISTING" ]]; then
+            echo "PR #$EXISTING already open for $BRANCH"
+            echo "PR_URL=$(gh pr view "$EXISTING" --json url --jq .url)" >> "$GITHUB_ENV"
+            exit 0
+          fi
+
+          URL=$(gh pr create \
+            --base main \
+            --head "$BRANCH" \
+            --title "chore: release ${{ inputs.version }}" \
+            --label "chore" \
+            --body "Releases [\`${{ inputs.version }}\`](${{ github.server_url }}/${{ github.repository }}/releases/tag/${{ inputs.version }}).
+
+          Brings the version stamp and the promoted changelog section back to \`main\`.
+
+          - Tag: \`${{ inputs.version }}\` (from \`$BRANCH\`)
+          - Candidate tested as: \`${{ inputs.version }}-rc\`
+
+          Merge this once the release looks correct.")
+          echo "PR_URL=$URL" >> "$GITHUB_ENV"
+
+      - name: Summary
+        run: |
+          {
+            echo "### Released ${{ inputs.version }}"
+            echo
+            echo "- Release: [${{ inputs.version }}](${{ github.server_url }}/${{ github.repository }}/releases/tag/${{ inputs.version }})"
+            echo "- Pull request to main: ${PR_URL}"
+            echo
+            echo "Merge the pull request to bring the version stamp back to \`main\`."
+          } >> "$GITHUB_STEP_SUMMARY"

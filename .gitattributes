@@ -1,0 +1,27 @@
+# Auto-detect text files and normalise line endings
+* text=auto eol=lf
+
+*.sh text eol=lf
+*.swift text eol=lf
+*.md text eol=lf
+*.yml text eol=lf
+
+# Recorded CLI transcripts: exact bytes matter, so never munge them
+Tests/AgenticCLIKitTests/Fixtures/** -text
+
+# Binary files
+*.png binary
+*.jpg binary
+*.pdf binary
+*.zip binary
+
+# GitHub language stats
+Tests/** linguist-vendored=false
+*.docc linguist-documentation
+
+# Excluded from `git archive` / source downloads
+.github/ export-ignore
+Tests/ export-ignore
+.gitignore export-ignore
+.gitattributes export-ignore
+.editorconfig export-ignore

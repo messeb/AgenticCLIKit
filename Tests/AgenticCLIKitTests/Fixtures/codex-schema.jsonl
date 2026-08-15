@@ -1,0 +1,4 @@
+{"type":"thread.started","thread_id":"01a006d3-8b44-75a0-b00d-38a786b57c40"}
+{"type":"turn.started"}
+{"type":"item.completed","item":{"id":"item_0","type":"agent_message","text":"{\"commitSubject\":\"Add Swift library for agentic CLIs\",\"commitDescription\":\"Introduce a reusable Swift library for building and driving agentic command-line interfaces.\"}"}}
+{"type":"turn.completed","usage":{"input_tokens":12368,"cached_input_tokens":1920,"cache_write_input_tokens":0,"output_tokens":73,"reasoning_output_tokens":29}}

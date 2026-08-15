@@ -1,0 +1,41 @@
+# Swift Package Manager
+.build/
+.swiftpm/
+Package.resolved
+*.xcodeproj
+*.xcworkspace
+
+# DocC output
+*.doccarchive
+.docc-build/
+docs-build/
+_site/
+
+# Xcode
+DerivedData/
+*.xcuserstate
+xcuserdata/
+*.moved-aside
+*.hmap
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+# Environment
+.env
+.env.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs and coverage
+*.log
+.coverage/
+*.profdata
+*.profraw

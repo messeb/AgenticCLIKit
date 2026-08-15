@@ -1,0 +1,70 @@
+name: Documentation
+
+# Publishes the DocC documentation to GitHub Pages.
+# Uses `xcodebuild docbuild` rather than swift-docc-plugin so the package keeps
+# its zero-third-party-dependency promise.
+
+on:
+  push:
+    branches: [main]
+  release:
+    types: [published]
+  workflow_dispatch:
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  build:
+    name: Build documentation
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Select the newest installed Xcode
+        run: |
+          LATEST=$(ls -d /Applications/Xcode_*.app 2>/dev/null | sort -V | tail -1 || true)
+          if [[ -n "$LATEST" ]]; then sudo xcode-select -s "$LATEST"; fi
+
+      - name: Build DocC archive
+        run: |
+          xcodebuild docbuild \
+            -scheme AgenticCLIKit \
+            -destination 'generic/platform=macOS' \
+            -derivedDataPath .docc-build
+
+      - name: Transform for static hosting
+        run: |
+          ARCHIVE=$(find .docc-build -type d -name 'AgenticCLIKit.doccarchive' | head -1)
+          if [[ -z "$ARCHIVE" ]]; then
+            echo "::error::No DocC archive was produced"
+            exit 1
+          fi
+          $(xcrun --find docc) process-archive transform-for-static-hosting \
+            "$ARCHIVE" \
+            --output-path _site \
+            --hosting-base-path AgenticCLIKit
+          # Land visitors on the module page instead of an empty index.
+          echo '<script>window.location.href = "/AgenticCLIKit/documentation/agenticclikit"</script>' > _site/index.html
+          touch _site/.nojekyll
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    name: Deploy to Pages
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

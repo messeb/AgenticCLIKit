@@ -1,0 +1,150 @@
+name: Prepare Release
+
+# Step one of a two-step, manually triggered release.
+#
+# Creates (or reuses) a `release/x.y.z` branch, stamps the version, and
+# publishes an `x.y.z-rc` pre-release from that branch.
+#
+# Re-running with the same version is the supported way to iterate: push fixes
+# to `release/x.y.z`, run this again, and the `x.y.z-rc` tag and pre-release are
+# replaced with the current branch head.
+#
+# Step two is the `Release` workflow, which promotes the branch to `x.y.z` and
+# opens a PR back to `main`.
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to prepare, without a leading v (e.g. 1.2.0)"
+        required: true
+        type: string
+
+concurrency:
+  group: release-${{ inputs.version }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  prepare:
+    name: Prepare ${{ inputs.version }}-rc
+    runs-on: macos-15
+    steps:
+      - name: Validate version
+        run: |
+          if [[ ! "${{ inputs.version }}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::'${{ inputs.version }}' is not a x.y.z version"
+            exit 1
+          fi
+
+      - uses: actions/checkout@v4
+        with:
+          # Full history so the release branch can be created from, and
+          # compared against, main.
+          fetch-depth: 0
+
+      - name: Select the newest installed Xcode
+        run: |
+          LATEST=$(ls -d /Applications/Xcode_*.app 2>/dev/null | sort -V | tail -1 || true)
+          if [[ -n "$LATEST" ]]; then sudo xcode-select -s "$LATEST"; fi
+          swift --version
+
+      - name: Check out or create the release branch
+        id: branch
+        env:
+          BRANCH: release/${{ inputs.version }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          if git ls-remote --exit-code --heads origin "$BRANCH" >/dev/null 2>&1; then
+            echo "Reusing existing $BRANCH"
+            git checkout "$BRANCH"
+            echo "created=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "Creating $BRANCH from main"
+            git checkout -b "$BRANCH" origin/main
+            echo "created=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Stamp the version
+        run: |
+          ./Scripts/set-version.sh "${{ inputs.version }}"
+          if git diff --quiet; then
+            echo "Version and changelog already current; nothing to commit"
+          else
+            git add Sources/AgenticCLIKit/Version.swift CHANGELOG.md
+            git commit -m "chore: prepare ${{ inputs.version }}"
+          fi
+
+      - name: Build and test
+        run: |
+          set -o pipefail
+          swift build --build-tests 2>&1 | tee build.log
+          if grep -q "warning:" build.log; then
+            echo "::error::Build produced warnings"
+            grep "warning:" build.log
+            exit 1
+          fi
+          swift test
+
+      - name: Push the release branch
+        env:
+          BRANCH: release/${{ inputs.version }}
+        run: git push --set-upstream origin "$BRANCH"
+
+      - name: Replace the release candidate
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ inputs.version }}-rc
+          BRANCH: release/${{ inputs.version }}
+        run: |
+          # The rc is a moving target by design: each run points it at the
+          # current branch head, so the pre-release always matches the branch.
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo "Deleting previous $TAG release and tag"
+            gh release delete "$TAG" --yes --cleanup-tag
+          elif git ls-remote --exit-code --tags origin "refs/tags/$TAG" >/dev/null 2>&1; then
+            git push --delete origin "refs/tags/$TAG"
+          fi
+
+          # Only diff against a previous release if one exists — on the very
+          # first release `--notes-start-tag ""` would be rejected.
+          PREVIOUS=$(gh release list --limit 1 --exclude-pre-releases --json tagName --jq '.[0].tagName // empty')
+          START_TAG_ARG=()
+          if [[ -n "$PREVIOUS" ]]; then
+            START_TAG_ARG=(--notes-start-tag "$PREVIOUS")
+          fi
+
+          gh release create "$TAG" \
+            --target "$BRANCH" \
+            --title "$TAG" \
+            --prerelease \
+            --generate-notes \
+            "${START_TAG_ARG[@]}" \
+            --notes "Release candidate for ${{ inputs.version }}, built from \`$BRANCH\`.
+
+          Try it:
+
+          \`\`\`swift
+          .package(url: \"https://github.com/messeb/AgenticCLIKit.git\", exact: \"$TAG\")
+          \`\`\`
+
+          Push fixes to \`$BRANCH\` and re-run **Prepare Release** to replace this candidate.
+          When it looks good, run **Release** to publish ${{ inputs.version }} and open the PR to main."
+
+      - name: Summary
+        env:
+          BRANCH: release/${{ inputs.version }}
+        run: |
+          {
+            echo "### Prepared ${{ inputs.version }}-rc"
+            echo
+            echo "- Branch: \`$BRANCH\` (${{ steps.branch.outputs.created == 'true' && 'created' || 'reused' }})"
+            echo "- Pre-release: [${{ inputs.version }}-rc](${{ github.server_url }}/${{ github.repository }}/releases/tag/${{ inputs.version }}-rc)"
+            echo
+            echo "Iterate by pushing to the branch and re-running this workflow."
+            echo "Publish with the **Release** workflow."
+          } >> "$GITHUB_STEP_SUMMARY"
