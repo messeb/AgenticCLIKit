@@ -45,6 +45,7 @@ jobs:
           fetch-depth: 0
 
       - name: Verify the release branch was prepared
+        id: verify
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -54,9 +55,15 @@ jobs:
             echo "::error::Run the Prepare Release workflow first."
             exit 1
           fi
+          # An existing release is not an error: the PR step is the last one and
+          # is the most likely to fail (it needs "Allow GitHub Actions to create
+          # and approve pull requests"). Re-running must be able to finish the
+          # job rather than refusing outright.
           if gh release view "${{ inputs.version }}" >/dev/null 2>&1; then
-            echo "::error::${{ inputs.version }} has already been released."
-            exit 1
+            echo "::notice::${{ inputs.version }} is already published; skipping release creation."
+            echo "already_released=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "already_released=false" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Select the newest installed Xcode
@@ -77,6 +84,7 @@ jobs:
           swift test
 
       - name: Publish the release
+        if: steps.verify.outputs.already_released != 'true'
         env:
           GH_TOKEN: ${{ github.token }}
           BRANCH: release/${{ inputs.version }}
@@ -102,7 +110,7 @@ jobs:
             exit 0
           fi
 
-          URL=$(gh pr create \
+          if ! URL=$(gh pr create \
             --base main \
             --head "$BRANCH" \
             --title "chore: release ${{ inputs.version }}" \
@@ -114,7 +122,12 @@ jobs:
           - Tag: \`${{ inputs.version }}\` (from \`$BRANCH\`)
           - Candidate tested as: \`${{ inputs.version }}-rc\`
 
-          Merge this once the release looks correct.")
+          Merge this once the release looks correct."); then
+            echo "::error::Could not open the pull request. Enable Settings → Actions → General →"
+            echo "::error::'Allow GitHub Actions to create and approve pull requests', then re-run this workflow."
+            echo "::error::The ${{ inputs.version }} release itself is already published and unaffected."
+            exit 1
+          fi
           echo "PR_URL=$URL" >> "$GITHUB_ENV"
 
       - name: Summary

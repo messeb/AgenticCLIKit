@@ -13,6 +13,24 @@ main ─────────────────────────
                 (replaced)(replaced) (final, via Release)
 ```
 
+## One-time repository setup
+
+Both workflows depend on settings that are off by default:
+
+| Setting | Where | Needed for |
+|---|---|---|
+| **Allow GitHub Actions to create and approve pull requests** | Settings → Actions → General → Workflow permissions | The Release workflow's PR back to `main` |
+| **Pages source: GitHub Actions** | Settings → Pages | Publishing documentation |
+| Labels `chore`, `fix`, `feature`, `breaking-change`, `compatibility`, `refactor`, `triage`, `ignore-for-release` | Issues → Labels | The release PR label and the generated release-note categories |
+
+```bash
+gh api --method PUT repos/messeb/AgenticCLIKit/actions/permissions/workflow \
+  -f default_workflow_permissions=read -F can_approve_pull_request_reviews=true
+gh api --method POST repos/messeb/AgenticCLIKit/pages -f build_type=workflow
+```
+
+Both release workflows are safe to re-run. If a step fails partway — the PR step is the usual one — fix the cause and run the workflow again with the same version; an already-published release is skipped rather than treated as an error.
+
 ## Step 1 — Prepare Release
 
 **Actions → Prepare Release → Run workflow**, with a version like `1.2.0`.
