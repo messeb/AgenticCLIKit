@@ -54,7 +54,7 @@ jobs:
           echo '<script>window.location.href = "/AgenticCLIKit/documentation/agenticclikit"</script>' > _site/index.html
           touch _site/.nojekyll
 
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-pages-artifact@v5
         with:
           path: _site
 
