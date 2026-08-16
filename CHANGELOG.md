@@ -6,6 +6,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ## [Unreleased]
 
+## [1.2.1] - 2026-08-16
+
 ### Fixed
 
 - Re-encoding a `null` or scalar tool payload no longer aborts the host process.
@@ -59,3 +61,4 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 [1.0.1]: https://github.com/messeb/AgenticCLIKit/releases/tag/1.0.1
 [1.1.0]: https://github.com/messeb/AgenticCLIKit/releases/tag/1.1.0
 [1.2.0]: https://github.com/messeb/AgenticCLIKit/releases/tag/1.2.0
+[1.2.1]: https://github.com/messeb/AgenticCLIKit/releases/tag/1.2.1
