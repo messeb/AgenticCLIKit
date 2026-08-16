@@ -31,6 +31,37 @@ struct JSONPassthrough: Decodable {
     }
 }
 
+/// Re-encodes a value parsed out of a CLI's JSON output, without crashing on the
+/// values a top-level `JSONSerialization` write rejects.
+///
+/// `JSONSerialization.data(withJSONObject:)` raises an **Objective-C exception**
+/// — not a Swift error — when handed anything that is not an array or a
+/// dictionary. `try?` does not catch that: it terminates the process. Every
+/// adapter re-encodes vendor payloads whose fields are nullable (`"input": null`
+/// on a tool call that carries no arguments is ordinary output, not a
+/// malformation), so the guard belongs in one place rather than at each call
+/// site.
+///
+/// - Returns: the encoded bytes, or `nil` for JSON `null`, a missing value, or
+///   anything that cannot be represented.
+func jsonData(from value: Any?) -> Data? {
+    guard let value, !(value is NSNull) else { return nil }
+
+    if JSONSerialization.isValidJSONObject(value) {
+        return try? JSONSerialization.data(withJSONObject: value)
+    }
+    // Scalars are legal JSON values but illegal top-level objects, and a CLI is
+    // free to put one where a record would fit. Keeping them costs one option
+    // flag and preserves information a caller might want.
+    //
+    // `isValidJSONObject` already rejects a NaN or an infinity *inside* a
+    // container, but it only inspects containers — a bare one has to be checked
+    // here, or the fragment write aborts exactly like the case above.
+    if let number = value as? NSNumber, !number.doubleValue.isFinite { return nil }
+    guard value is String || value is NSNumber else { return nil }
+    return try? JSONSerialization.data(withJSONObject: value, options: [.fragmentsAllowed])
+}
+
 /// A decoded JSON value, kept as Foundation types.
 enum JSONValue: Decodable {
     case string(String)

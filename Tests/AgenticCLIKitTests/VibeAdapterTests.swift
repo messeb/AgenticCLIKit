@@ -84,6 +84,65 @@ struct VibeAdapterTests {
         #expect(events.filter { $0.kind == "assistantMessage" }.count == 1)
     }
 
+    // MARK: - Nullable payloads
+
+    /// Regression: this used to abort the process, not fail a test.
+    ///
+    /// Every effect kind in `vibe`'s own schema declares `input` as nullable,
+    /// and the generic kind types it as any JSON value — so `"input": null` and
+    /// `"input": "text"` are ordinary output, not malformations. Passing either
+    /// to `JSONSerialization.data(withJSONObject:)` raises an **Objective-C**
+    /// exception, which `try?` cannot catch: it calls `abort()`. A long-running
+    /// app would crash the moment an argument-less tool call arrived.
+    ///
+    /// The lines below are hand-written rather than recorded, because the case
+    /// needs a session long enough to compact before the CLI emits one.
+    @Test(
+        "Survives effects whose input or output is null or a scalar",
+        arguments: [
+            #"{"sessionId":"s1","type":"effect","id":"e1","title":"todo","detail":{"toolName":"todo","input":null},"state":{"status":"completed","output":null}}"#,
+            #"{"sessionId":"s1","type":"effect","id":"e2","title":"skill","detail":{"toolName":"skill","input":"review"},"state":{"status":"completed","output":"done"}}"#,
+            #"{"sessionId":"s1","type":"effect","id":"e3","title":"task","detail":{"toolName":"task","input":42},"state":{"status":"failed","output":7}}"#,
+        ]
+    )
+    func nullableEffectPayloads(line: String) async throws {
+        let runner = RecordedProcessRunner(always: .output(line + "\n"))
+        let events = try await makeAdapter(runner: runner)
+            .stream("do something", configuration: configuration())
+            .allEvents()
+
+        // The call still surfaces; only its payload is absent or re-encoded.
+        let invocation = try #require(events.compactMap { event -> ToolInvocation? in
+            if case let .toolUseRequested(invocation) = event { return invocation }
+            return nil
+        }.first)
+        #expect(!invocation.name.isEmpty)
+        #expect(events.contains { $0.kind == "toolResult" })
+    }
+
+    @Test("Keeps a scalar payload rather than dropping it")
+    func scalarPayloadsAreKept() async throws {
+        let line = #"{"sessionId":"s1","type":"effect","id":"e1","title":"skill","detail":{"toolName":"skill","input":"code-review"},"state":{"status":"completed","output":null}}"#
+        let runner = RecordedProcessRunner(always: .output(line + "\n"))
+        let events = try await makeAdapter(runner: runner)
+            .stream("load a skill", configuration: configuration())
+            .allEvents()
+
+        let invocation = try #require(events.compactMap { event -> ToolInvocation? in
+            if case let .toolUseRequested(invocation) = event { return invocation }
+            return nil
+        }.first)
+        let input = try #require(invocation.input)
+        #expect(String(decoding: input, as: UTF8.self) == "\"code-review\"")
+
+        // A null output falls through to the running text, which is absent here.
+        let outcome = try #require(events.compactMap { event -> ToolOutcome? in
+            if case let .toolResult(outcome) = event { return outcome }
+            return nil
+        }.first)
+        #expect(outcome.output == nil)
+    }
+
     // MARK: - Resume
 
     /// A resumed run replays the entire transcript before the new turn. Emitting

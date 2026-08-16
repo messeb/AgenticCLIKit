@@ -234,7 +234,11 @@ extension Vibe {
             let detail = entry["detail"] as? [String: Any] ?? [:]
             let name = detail["toolName"] as? String ?? entry["title"] as? String ?? "tool"
             let id = entry["id"] as? String
-            let input = detail["input"].flatMap { try? JSONSerialization.data(withJSONObject: $0) }
+            // `input` is nullable for every effect kind `vibe` defines — a tool
+            // call that carries no arguments prints `"input": null` — and the
+            // generic kind types it as any JSON value, so it can be a scalar.
+            // Handing either to `JSONSerialization` directly aborts the process.
+            let input = jsonData(from: detail["input"])
 
             var events: [AgentEvent] = [
                 .toolUseRequested(ToolInvocation(id: id, name: name, input: input)),
@@ -245,7 +249,9 @@ extension Vibe {
             // `cancelled` is what a denied tool looks like from here: `vibe`
             // cancels the call rather than failing it. The `callback` entry
             // carries the denial itself, so this stays a result.
-            let output = state["output"].flatMap { try? JSONSerialization.data(withJSONObject: $0) }
+            // `output` is nullable too — a cancelled or failed effect has none —
+            // and the running text is the fallback when it does.
+            let output = jsonData(from: state["output"])
                 ?? (state["outputText"] as? String).map { Data($0.utf8) }
             events.append(.toolResult(ToolOutcome(
                 id: id,
