@@ -1,6 +1,6 @@
 # ``AgenticCLIKit``
 
-Drive locally installed AI agent CLIs — Claude Code, Codex, GitHub Copilot, and Antigravity — from a macOS app.
+Drive locally installed AI agent CLIs — Claude Code, Codex, GitHub Copilot, Antigravity, and Mistral Vibe — from a macOS app.
 
 ## Overview
 
@@ -77,6 +77,7 @@ let response = try await kit.run(
 - ``Codex``
 - ``Copilot``
 - ``Antigravity``
+- ``Vibe``
 
 ### Extending the kit
 

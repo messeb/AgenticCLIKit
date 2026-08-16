@@ -1,0 +1,38 @@
+{
+  "session_id": "3faf00b9-4bb2-d481-4a78-d509562ff0eb",
+  "parent_session_id": null,
+  "start_time": "2026-08-16T11:24:21.073886+00:00",
+  "end_time": "2026-08-16T11:24:43.487087+00:00",
+  "environment": {
+    "working_directory": "/tmp/vibe-fixture"
+  },
+  "title": "Read the file /tmp/vibe-fixture/notes.txt\u2026",
+  "title_source": "auto",
+  "stats": {
+    "steps": 5,
+    "session_prompt_tokens": 15821,
+    "session_completion_tokens": 1279,
+    "session_cached_tokens": 9600,
+    "tool_calls_agreed": 1,
+    "tool_calls_rejected": 0,
+    "tool_calls_hook_denied": 0,
+    "tool_calls_failed": 0,
+    "tool_calls_succeeded": 1,
+    "context_tokens": 7522,
+    "last_turn_prompt_tokens": 7326,
+    "last_turn_completion_tokens": 196,
+    "last_turn_cached_tokens": 3584,
+    "last_turn_duration": 2.4027960839885054,
+    "tokens_per_second": 81.57163285976857,
+    "input_price_per_million": 1.5,
+    "output_price_per_million": 7.5,
+    "cached_input_price_per_million": 0.15,
+    "session_total_llm_tokens": 17100,
+    "last_turn_total_tokens": 7522,
+    "session_cost": 0.020364
+  },
+  "total_messages": 7,
+  "config": {
+    "active_model": "mistral-medium-3.5"
+  }
+}

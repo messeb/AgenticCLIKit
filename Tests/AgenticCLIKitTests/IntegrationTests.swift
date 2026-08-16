@@ -26,7 +26,7 @@ enum IntegrationGate {
     .timeLimit(.minutes(2))
 )
 struct DiscoveryIntegrationTests {
-    /// The performance target, split by what it actually costs. The three CLIs
+    /// The performance target, split by what it actually costs. The four CLIs
     /// with local credential checks are the fast path a launch screen depends
     /// on; `agy` has no local check and spends ~2s asking its backend, which no
     /// amount of parallelism removes.
@@ -37,6 +37,7 @@ struct DiscoveryIntegrationTests {
             ClaudeCode.Adapter(locator: locator),
             Codex.Adapter(locator: locator),
             Copilot.Adapter(locator: locator),
+            Vibe.Adapter(locator: locator),
         ])
 
         let clock = ContinuousClock()
@@ -45,11 +46,11 @@ struct DiscoveryIntegrationTests {
         let elapsed = clock.now - started
 
         print(report.formattedSummary())
-        print("three local CLIs probed in \(elapsed.seconds)s")
+        print("four local CLIs probed in \(elapsed.seconds)s")
         #expect(elapsed < .seconds(2))
     }
 
-    @Test("All four CLIs probe concurrently, bounded by the slowest one")
+    @Test("All five CLIs probe concurrently, bounded by the slowest one")
     func probesAllCLIsConcurrently() async throws {
         let kit = AgenticCLIKit()
         let clock = ContinuousClock()
@@ -58,8 +59,8 @@ struct DiscoveryIntegrationTests {
         let elapsed = clock.now - started
 
         print(report.formattedSummary())
-        print("all four probed in \(elapsed.seconds)s")
-        #expect(report.entries.count == 4)
+        print("all five probed in \(elapsed.seconds)s")
+        #expect(report.entries.count == 5)
         // Comfortably below the ~3s a serial pass over the same probes takes.
         #expect(elapsed < .seconds(5))
 
@@ -334,6 +335,53 @@ struct LiveRunIntegrationTests {
             #expect(response.text.contains("OK"))
             #expect(response.session != nil)
             #expect(response.usage?.inputTokens != nil)
+        }
+    }
+
+    /// Three things about `vibe` can only be checked against the real binary:
+    /// that a run does not stall on the trust prompt, that usage arrives from a
+    /// file written after the process exits, and that `--max-turns` — which
+    /// counts the whole session — is offset far enough for a resumed turn to
+    /// actually happen.
+    @Test("Vibe runs read-only, reports cost from its session log, and resumes elsewhere")
+    func vibeRunsAndResumes() async throws {
+        let adapter = Vibe.Adapter()
+        try await adapter.verifyReady()
+
+        try await withScratchDirectory { directory in
+            var configuration = RunConfiguration(
+                workingDirectory: directory,
+                permissions: .readOnly,
+                timeout: .seconds(180)
+            )
+            configuration.maximumTurns = 4
+
+            let opening = try await adapter.run("Reply with exactly: OK", configuration: configuration)
+            #expect(opening.text.contains("OK"))
+
+            let session = try #require(opening.session)
+            // Tokens and dollars come from `$VIBE_HOME/logs/session/…/meta.json`,
+            // so this failing means the log moved, not that the run did.
+            #expect(opening.usage?.inputTokens != nil)
+            #expect(opening.usage?.costUSD != nil)
+
+            // Sessions are global, so resuming from another directory works —
+            // and the turn limit has to be offset by the steps already taken or
+            // this stops before it starts.
+            var elsewhere = RunConfiguration(
+                workingDirectory: FileManager.default.temporaryDirectory,
+                permissions: .readOnly,
+                timeout: .seconds(180)
+            )
+            elsewhere.maximumTurns = 4
+
+            let resumed = try await adapter.resume(
+                session,
+                with: "Reply with exactly: RESUMED",
+                configuration: elsewhere
+            )
+            #expect(resumed.text.contains("RESUMED"))
+            #expect(resumed.session?.sessionID == session.sessionID)
         }
     }
 

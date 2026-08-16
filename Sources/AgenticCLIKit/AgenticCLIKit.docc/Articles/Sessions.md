@@ -28,7 +28,9 @@ The session is stored when ``AgentEvent/sessionStarted(_:)`` arrives, not at the
 
 ## Directory scope differs per CLI
 
-`claude` and `codex` resume by identifier from anywhere. Antigravity does not document cross-directory resume, so its adapter validates the working directory and throws ``AgenticCLIError/workingDirectoryMismatch(_:attempted:)`` rather than letting the CLI fail confusingly later.
+`claude`, `codex`, `copilot`, and `vibe` resume by identifier from anywhere. Antigravity does not document cross-directory resume, so its adapter validates the working directory and throws ``AgenticCLIError/workingDirectoryMismatch(_:attempted:)`` rather than letting the CLI fail confusingly later.
+
+`vibe` adds a wrinkle of its own: ``RunConfiguration/maximumTurns`` is compared against the number of steps the *session* has taken, not the run, so a resumed turn asked for "two more turns" on a session that already took five would stop before producing anything. ``Vibe/Adapter`` reads the session's step count from the CLI's own log and offsets the limit, so the number means the same thing on every adapter.
 
 Branch on the capability, not on the CLI name:
 

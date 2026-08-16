@@ -6,6 +6,21 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ## [Unreleased]
 
+### Added
+
+- Adapter for Mistral Vibe (`vibe`), verified against 2.24.1: streaming NDJSON,
+  sessions with cross-directory resume, a per-tool allowlist, and file
+  attachments. Marked experimental — the CLI ships roughly weekly.
+- `RunConfiguration.maximumTurns` is honoured for the first time. `vibe` counts
+  turns across the whole session, so `Vibe.Adapter` offsets the limit by the
+  session's recorded step count and the value keeps its meaning on resume.
+- Token and USD-cost reporting for `vibe`, read from its session log
+  (`$VIBE_HOME/logs/session/…/meta.json`) after the process exits, since none of
+  it reaches stdout. Missing logs cost the usage, never the run.
+- `Vibe.Model` and discovery from `~/.vibe/config.toml`. A model alias `vibe`
+  does not know is refused with `.unsupportedModel`, because `vibe` would
+  otherwise ignore it and bill the run on its default model.
+
 ## [1.1.0] - 2026-08-16
 
 ## [1.0.1] - 2026-08-15

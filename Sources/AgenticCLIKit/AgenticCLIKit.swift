@@ -46,6 +46,7 @@ public struct AgenticCLIKit: Sendable {
             Codex.Adapter(locator: locator),
             Copilot.Adapter(locator: locator),
             Antigravity.Adapter(locator: locator),
+            Vibe.Adapter(locator: locator),
         ]
     }
 

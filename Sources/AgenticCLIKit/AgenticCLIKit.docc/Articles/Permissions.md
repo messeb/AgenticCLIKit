@@ -27,7 +27,7 @@ let configuration = RunConfiguration(
 
 ## Refusal beats silent widening
 
-`allowingTools` needs ``CLICapabilities/toolAllowlist``. Codex and Antigravity sandbox by filesystem scope rather than by tool name, so they cannot express it — and rather than quietly running with something broader, they throw ``AgenticCLIError/unsupportedPermissionPolicy(_:_:reason:)`` with the reason.
+`allowingTools` needs ``CLICapabilities/toolAllowlist`` — Claude Code, Copilot, and Vibe have it. Codex and Antigravity sandbox by filesystem scope rather than by tool name, so they cannot express it — and rather than quietly running with something broader, they throw ``AgenticCLIError/unsupportedPermissionPolicy(_:_:reason:)`` with the reason.
 
 ```swift
 do {
@@ -49,12 +49,14 @@ The name carries the warning, in the manner of `unsafeBitCast`. It disables ever
 
 ## How the policies map
 
-| Policy | `claude` | `codex` | `agy` |
-|---|---|---|---|
-| `planOnly` | `--permission-mode plan` | `--sandbox read-only` | `--mode plan` |
-| `readOnly` | `--permission-mode manual` + allow/deny lists | `--sandbox read-only` | `--mode plan --sandbox` |
-| `acceptingEdits` | `--permission-mode acceptEdits` | `--sandbox workspace-write` | `--mode accept-edits` |
-| `unsafeBypassAll` | `--dangerously-skip-permissions` | `--dangerously-bypass-approvals-and-sandbox` | `--dangerously-skip-permissions` |
+| Policy | `claude` | `codex` | `agy` | `vibe` |
+|---|---|---|---|---|
+| `planOnly` | `--permission-mode plan` | `--sandbox read-only` | `--mode plan` | `--agent plan` |
+| `readOnly` | `--permission-mode manual` + allow/deny lists | `--sandbox read-only` | `--mode plan --sandbox` | `--agent plan --auto-approve` + `--enabled-tools` allowlist |
+| `acceptingEdits` | `--permission-mode acceptEdits` | `--sandbox workspace-write` | `--mode accept-edits` | `--agent accept-edits` |
+| `unsafeBypassAll` | `--dangerously-skip-permissions` | `--dangerously-bypass-approvals-and-sandbox` | `--dangerously-skip-permissions` | `--agent auto-approve --auto-approve` |
+
+On `vibe`, an `--enabled-tools` list is real enforcement rather than a request: in programmatic mode it disables every tool it does not name. So ``PermissionPolicy/readOnly`` is expressed as an allowlist of the tools that only observe, not as a profile that merely discourages the rest. A tool a later `vibe` release adds is *not* on that list — the safe direction for a list that can go stale.
 
 > Note: On Antigravity, a schema run cannot use plan mode — see <doc:TypedResults>.
 
