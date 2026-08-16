@@ -6,6 +6,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-08-16
+
 ### Added
 
 - Adapter for Mistral Vibe (`vibe`), verified against 2.24.1: streaming NDJSON,
@@ -48,3 +50,4 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 [1.0.0]: https://github.com/messeb/AgenticCLIKit/releases/tag/1.0.0
 [1.0.1]: https://github.com/messeb/AgenticCLIKit/releases/tag/1.0.1
 [1.1.0]: https://github.com/messeb/AgenticCLIKit/releases/tag/1.1.0
+[1.2.0]: https://github.com/messeb/AgenticCLIKit/releases/tag/1.2.0
