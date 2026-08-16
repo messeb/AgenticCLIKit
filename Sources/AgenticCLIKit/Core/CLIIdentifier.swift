@@ -26,8 +26,10 @@ public struct CLIIdentifier: RawRepresentable, Hashable, Sendable, Codable {
     public static let claudeCode = CLIIdentifier("claude-code")
     /// OpenAI's Codex CLI (`codex`).
     public static let codex = CLIIdentifier("codex")
-    /// GitHub CLI (`gh`).
-    public static let github = CLIIdentifier("github")
+    /// GitHub's Copilot CLI (`copilot`), GitHub's coding agent.
+    ///
+    /// Not `gh`: that binary manages repositories and takes no prompts.
+    public static let copilot = CLIIdentifier("copilot")
     /// Google's Antigravity CLI (`agy`).
     public static let antigravity = CLIIdentifier("antigravity")
 }

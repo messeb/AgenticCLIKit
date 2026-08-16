@@ -18,7 +18,6 @@ private extension Duration {
 ///     agentickit run claude-code "Summarise this directory" [--permissions readOnly] [--stream]
 ///     agentickit resume claude-code <session-id> "And the tests?"
 ///     agentickit continue codex "Keep going"
-///     agentickit gh pr list --json number,title
 ///     agentickit sessions
 ///     agentickit commit-message claude-code --dir ~/project
 ///     agentickit run claude-code "Summarise it" --attach report.pdf --attach https://example.com/spec.pdf
@@ -39,7 +38,7 @@ struct AgenticKitCommand {
             case "resume": try await resume(Array(arguments.dropFirst()))
             case "continue": try await continueSession(Array(arguments.dropFirst()))
             case "commit-message": try await commitMessage(Array(arguments.dropFirst()))
-            case "gh": try await github(Array(arguments.dropFirst()))
+            case "models": try await models(Array(arguments.dropFirst()))
             case "sessions": try await sessions()
             case "help", "--help", "-h": print(usage)
             default:
@@ -68,14 +67,14 @@ struct AgenticKitCommand {
       agentickit resume <cli> <session-id> <prompt> [options]
       agentickit continue <cli> <prompt> [options]
       agentickit commit-message <cli> [--dir <path>]
-      agentickit gh <args...>
+      agentickit models [<cli>]
       agentickit sessions
 
     ATTACHMENTS
       --attach <path-or-url>   repeatable; remote URLs are downloaded first
 
     CLIs
-      claude-code, codex, github, antigravity
+      claude-code, codex, copilot, antigravity
 
     POLICIES
       planOnly (default), readOnly, acceptingEdits, unsafeBypassAll
@@ -180,16 +179,39 @@ struct AgenticKitCommand {
         printFooter(response.response)
     }
 
-    static func github(_ arguments: [String]) async throws {
-        let adapter = GitHub.Adapter()
-        let response = try await adapter.execute(
-            arguments,
-            configuration: RunConfiguration(
-                workingDirectory: URL(fileURLWithPath: FileManager.default.currentDirectoryPath),
-                permissions: .readOnly
-            )
-        )
-        print(response.text)
+    /// Shows what each CLI reports, and where the answer came from.
+    static func models(_ arguments: [String]) async throws {
+        let kit = try makeKit()
+
+        if let name = arguments.first {
+            printModels(try await kit.availableModels(for: CLIIdentifier(name)), for: CLIIdentifier(name))
+            return
+        }
+
+        let byCLI = await kit.availableModelsByCLI()
+        guard !byCLI.isEmpty else {
+            print("No installed CLI could report its models.")
+            return
+        }
+        for cli in byCLI.keys.sorted(by: { $0.rawValue < $1.rawValue }) {
+            printModels(byCLI[cli] ?? [], for: cli)
+            print()
+        }
+    }
+
+    static func printModels(_ models: [AgentModel], for cli: CLIIdentifier) {
+        let provenance = models.isCompleteCatalogue
+            ? "complete list, reported by the CLI"
+            : "may be incomplete — any model identifier is still accepted"
+        print("\(cli) (\(provenance))")
+
+        for model in models {
+            var line = "  \(model.isDefault ? "*" : " ") \(model.id)"
+            if let displayName = model.displayName { line += "  \(displayName)" }
+            line += "  [\(model.origin.rawValue)]"
+            print(line)
+            if let summary = model.summary { print("      \(summary)") }
+        }
     }
 
     static func sessions() async throws {

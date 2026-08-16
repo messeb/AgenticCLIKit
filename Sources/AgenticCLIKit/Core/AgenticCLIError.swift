@@ -20,6 +20,14 @@ public enum AgenticCLIError: Error, Sendable {
     case unsupportedPermissionPolicy(CLIIdentifier, PermissionPolicy, reason: String)
     /// A flag the adapter needs is missing from the installed build.
     case unsupportedByVersion(CLIIdentifier, feature: String, found: SemanticVersion?)
+    /// The requested model is not one this CLI will run.
+    ///
+    /// Distinct from ``unsupportedCapability(_:_:)``: model selection works, the
+    /// name does not. It is usually not a typo — Copilot resolves the available
+    /// set against the signed-in account at launch, so a name that worked
+    /// yesterday, or that the CLI itself wrote into its own settings, can be
+    /// refused today.
+    case unsupportedModel(CLIIdentifier, model: String, reason: String)
     /// The CLI no longer knows about this session.
     case sessionNotFound(SessionReference)
     /// The session exists but can no longer be continued.
@@ -67,6 +75,8 @@ extension AgenticCLIError: LocalizedError {
             return "\(cli) does not support \(capability)."
         case let .unsupportedPermissionPolicy(cli, policy, reason):
             return "\(cli) cannot honour the permission policy \(policy): \(reason)"
+        case let .unsupportedModel(cli, model, reason):
+            return "\(cli) cannot run the model '\(model)': \(reason)"
         case let .unsupportedByVersion(cli, feature, found):
             let foundText = found.map(\.description) ?? "the installed version"
             return "\(cli) \(foundText) does not support \(feature)."
@@ -114,6 +124,9 @@ extension AgenticCLIError: LocalizedError {
         case .turnLimitReached: return "Raise RunConfiguration.maximumTurns or resume the session."
         case .timedOut: return "Raise RunConfiguration.timeout."
         case .attachmentTooLarge: return "Raise RunConfiguration.maximumAttachmentBytes or send a smaller file."
+        case let .unsupportedModel(cli, _, _):
+            return "Enable the model for your account, leave RunConfiguration.model unset "
+                + "to use \(cli)'s own default, or pick a model it currently offers."
         default: return nil
         }
     }
@@ -124,6 +137,7 @@ extension AgenticCLIError: LocalizedError {
         case let .notInstalled(cli, _), let .unsupportedVersion(cli, _, _),
              let .notAuthenticated(cli, _), let .unsupportedCapability(cli, _),
              let .unsupportedPermissionPolicy(cli, _, _), let .unsupportedByVersion(cli, _, _),
+             let .unsupportedModel(cli, _, _),
              let .timedOut(cli, _), let .cancelled(cli),
              let .turnLimitReached(cli, _), let .outputLimitExceeded(cli, _),
              let .processFailed(cli, _, _), let .launchFailed(cli, _):

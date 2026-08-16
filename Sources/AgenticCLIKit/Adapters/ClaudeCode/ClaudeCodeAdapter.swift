@@ -35,6 +35,7 @@ extension ClaudeCode {
                 .modelSelection, .usageReporting, .toolAllowlist,
                 .resumeAcrossDirectories, .ephemeralRuns, .additionalDirectories,
                 .systemPromptCustomization, .nativeOutputSchema, .fileAttachments,
+                .modelDiscovery,
             ]
         }
 
@@ -93,6 +94,66 @@ extension ClaudeCode {
                 return .expired(account, loginCommand: loginCommand)
             }
             return .authenticated(account)
+        }
+
+        // MARK: - Models
+
+        /// The maintained ``ClaudeCode/Model`` list, merged with any aliases the
+        /// installed binary documents for `--model`.
+        ///
+        /// The help text is worth reading even though it is thin: it comes from
+        /// the binary on this machine, so a newly added alias shows up without a
+        /// package update. It is additive only — `claude` has no command that
+        /// enumerates models, so the maintained list stays the backbone.
+        public func availableModels() async throws -> [AgentModel] {
+            var models = Model.agentModels
+            let known = Set(models.map(\.id))
+
+            for alias in await documentedModelAliases() where !known.contains(alias) {
+                models.append(AgentModel(id: alias, origin: .documentation))
+            }
+            return models
+        }
+
+        /// Values quoted in the `--model` paragraph of `claude --help`.
+        func documentedModelAliases() async -> [String] {
+            guard let result = await probe(["--help"]), result.exit.isSuccess else { return [] }
+            return Self.parseModelAliases(fromHelp: result.standardOutputText)
+        }
+
+        /// `claude --help` wraps flag descriptions across indented continuation
+        /// lines, so the paragraph has to be reassembled before the quoted
+        /// example values can be pulled out of it.
+        static func parseModelAliases(fromHelp help: String) -> [String] {
+            let lines = help.split(separator: "\n", omittingEmptySubsequences: false)
+            guard let start = lines.firstIndex(where: { $0.contains("--model <model>") }) else {
+                return []
+            }
+
+            var paragraph = String(lines[start])
+            for line in lines[(start + 1)...] {
+                // A new flag starts at two spaces followed by a dash; anything
+                // more deeply indented continues the current description.
+                if line.hasPrefix("  -") || !line.hasPrefix("   ") { break }
+                paragraph += " " + line.trimmingCharacters(in: .whitespaces)
+            }
+
+            // Excluding whitespace inside the quotes matters: the paragraph
+            // contains the possessive in "model's full name", and a greedier
+            // pattern pairs that apostrophe with the next quote and swallows the
+            // example that follows it.
+            let pattern = #"'([^'\s]+)'"#
+            guard let regex = try? NSRegularExpression(pattern: pattern) else { return [] }
+            let range = NSRange(paragraph.startIndex..<paragraph.endIndex, in: paragraph)
+
+            var aliases: [String] = []
+            for match in regex.matches(in: paragraph, range: range) {
+                guard let matched = Range(match.range(at: 1), in: paragraph) else { continue }
+                let value = String(paragraph[matched])
+                guard !value.isEmpty, !aliases.contains(value) else { continue }
+                aliases.append(value)
+            }
+            return aliases
         }
 
         // MARK: - Running

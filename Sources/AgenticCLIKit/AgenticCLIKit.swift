@@ -44,7 +44,7 @@ public struct AgenticCLIKit: Sendable {
         [
             ClaudeCode.Adapter(locator: locator),
             Codex.Adapter(locator: locator),
-            GitHub.Adapter(locator: locator),
+            Copilot.Adapter(locator: locator),
             Antigravity.Adapter(locator: locator),
         ]
     }
@@ -76,7 +76,7 @@ public struct AgenticCLIKit: Sendable {
     /// auth probes would take seconds on a cold start.
     ///
     /// Cold-probe cost is dominated by whichever CLI checks credentials over the
-    /// network. Locally-checked CLIs (`claude`, `codex`, `gh`) come back in
+    /// network. Locally-checked CLIs (`claude`, `codex`, `copilot`) come back in
     /// roughly half a second combined; `agy` has no local credential check and
     /// costs about two seconds on its own. Pass `maximumAge` on repeat calls —
     /// a status bar refreshing every few seconds should not re-probe every time.

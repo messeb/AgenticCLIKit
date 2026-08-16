@@ -38,7 +38,11 @@ public struct Installation: Hashable, Sendable, Codable {
         return version >= minimumSupportedVersion
     }
 
-    static func missing(
+    /// The "not installed" result: no executable, no version.
+    ///
+    /// Public because an adapter written outside this module has to be able to
+    /// report it — ``AgenticCLI/installation()`` has no other way to say no.
+    public static func missing(
         cli: CLIIdentifier,
         minimumSupportedVersion: SemanticVersion,
         installHint: String

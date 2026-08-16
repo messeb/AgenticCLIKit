@@ -6,6 +6,24 @@ Here's the PRD. I've grounded the adapter details in the actual current CLI surf
 
 **Status:** Draft v0.1 · **Owner:** Sebastian · **Target platforms:** macOS 13+ (primary), Linux (secondary, for server-side Swift)
 
+> **Scope change, 2026-08-16.** This document is the original planning draft and
+> is kept as written; the README is the current specification. One decision has
+> since been reversed: the fourth adapter is **GitHub Copilot (`copilot`)**, not
+> the GitHub CLI (`gh`).
+>
+> The draft below treats `gh` as GitHub's entry and leans on it as the
+> capability-poor adapter that keeps the abstraction honest. That conflated two
+> unrelated binaries: `gh` manages repositories and takes no prompts, while
+> `copilot` is GitHub's actual coding agent — it prompts, streams token deltas,
+> holds resumable sessions, takes attachments, and has the most expressive
+> per-tool permission model of any CLI here. Wrapping `gh` in an *agent*
+> abstraction was a category error, so it was removed.
+>
+> The role `gh` was serving in the design is now filled by `StubAgent` in
+> `AgenticCLIKitTesting`, which is a better fit: a test double with configurable
+> capabilities cannot quietly gain a capability and stop testing degradation, the
+> way a real adapter can.
+
 ## 1. Problem Statement
 
 Apps increasingly want to delegate work to locally installed agentic CLIs (Claude Code, Codex, Antigravity) and tooling CLIs (GitHub CLI) instead of talking to raw HTTP APIs. The CLIs bring their own auth, billing, sandboxing, and session persistence. But integrating them from a Swift app today means hand-rolling `Process` plumbing, per-CLI flag knowledge, JSON/JSONL parsing, exit-code interpretation, and session bookkeeping, four times over, with breaking changes on every CLI release.
