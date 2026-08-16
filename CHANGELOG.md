@@ -6,6 +6,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-08-16
+
 ## [1.0.1] - 2026-08-15
 
 ## [1.0.0] - 2026-08-15
@@ -30,3 +32,4 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 [Unreleased]: https://github.com/messeb/AgenticCLIKit/commits/main
 [1.0.0]: https://github.com/messeb/AgenticCLIKit/releases/tag/1.0.0
 [1.0.1]: https://github.com/messeb/AgenticCLIKit/releases/tag/1.0.1
+[1.1.0]: https://github.com/messeb/AgenticCLIKit/releases/tag/1.1.0
