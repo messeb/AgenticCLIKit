@@ -152,7 +152,10 @@ extension ClaudeCode {
                 case let text as String:
                     output = Data(text.utf8)
                 case let value?:
-                    output = try? JSONSerialization.data(withJSONObject: value)
+                    // Not `JSONSerialization` directly: a `null` or a bare
+                    // number here raises an ObjC exception that `try?` cannot
+                    // catch, which aborts the process.
+                    output = jsonData(from: value)
                 default:
                     output = nil
                 }

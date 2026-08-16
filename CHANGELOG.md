@@ -6,6 +6,14 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ## [Unreleased]
 
+### Fixed
+
+- Re-encoding a `null` or scalar tool payload no longer aborts the host process.
+  `JSONSerialization.data(withJSONObject:)` raises an Objective-C exception that
+  `try?` cannot catch, and `vibe` prints `"input": null` for any tool call
+  carrying no arguments. The same unguarded pattern is corrected in the Claude
+  Code, Copilot, and Antigravity translators.
+
 ## [1.2.0] - 2026-08-16
 
 ### Added

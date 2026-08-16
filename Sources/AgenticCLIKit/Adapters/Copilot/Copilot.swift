@@ -185,16 +185,15 @@ extension Copilot {
 
             switch type {
             case "tool.execution_start":
-                let input = payload["arguments"].flatMap {
-                    try? JSONSerialization.data(withJSONObject: $0)
-                }
+                // A tool called with no arguments prints `null` here, which
+                // `JSONSerialization` refuses with an ObjC exception rather than
+                // a Swift error — uncatchable, and fatal.
+                let input = jsonData(from: payload["arguments"])
                 return [.toolUseRequested(ToolInvocation(id: id, name: name, input: input))]
 
             case "tool.execution_complete":
                 let succeeded = payload["success"] as? Bool ?? true
-                let output = payload["result"].flatMap {
-                    try? JSONSerialization.data(withJSONObject: $0)
-                }
+                let output = jsonData(from: payload["result"])
                 return [.toolResult(ToolOutcome(
                     id: id, name: name, output: output, isError: !succeeded
                 ))]

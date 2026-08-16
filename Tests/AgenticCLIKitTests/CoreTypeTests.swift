@@ -212,3 +212,33 @@ struct ErrorTests {
         #expect(AgenticCLIError.timedOut(.codex, after: .seconds(5)).isTransient)
     }
 }
+
+@Suite("JSON re-encoding")
+struct JSONDataTests {
+    /// `JSONSerialization.data(withJSONObject:)` raises an ObjC exception for
+    /// these, and an ObjC exception is not catchable from Swift — it aborts the
+    /// process. Every adapter re-encodes nullable vendor fields, so the guard is
+    /// what keeps a `"input": null` from killing the host app.
+    @Test("Returns nil for values a top-level JSON write would reject")
+    func rejectsFragmentsThatCannotBeEncoded() {
+        #expect(jsonData(from: nil) == nil)
+        #expect(jsonData(from: NSNull()) == nil)
+        #expect(jsonData(from: Date()) == nil)
+        #expect(jsonData(from: Double.nan) == nil)
+    }
+
+    @Test("Encodes containers and keeps scalars")
+    func encodesWhatItCan() throws {
+        let object = try #require(jsonData(from: ["a": 1]))
+        #expect(String(decoding: object, as: UTF8.self) == #"{"a":1}"#)
+
+        let array = try #require(jsonData(from: [1, 2]))
+        #expect(String(decoding: array, as: UTF8.self) == "[1,2]")
+
+        let string = try #require(jsonData(from: "hi"))
+        #expect(String(decoding: string, as: UTF8.self) == #""hi""#)
+
+        let number = try #require(jsonData(from: 42))
+        #expect(String(decoding: number, as: UTF8.self) == "42")
+    }
+}

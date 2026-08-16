@@ -72,7 +72,7 @@ extension Antigravity {
             case "result":
                 guard
                     let payload = object["result"],
-                    let payloadData = try? JSONSerialization.data(withJSONObject: payload),
+                    let payloadData = jsonData(from: payload),
                     let decoded = try? decoder.decode(ResultPayload.self, from: payloadData)
                 else {
                     return events + [.raw(data)]
