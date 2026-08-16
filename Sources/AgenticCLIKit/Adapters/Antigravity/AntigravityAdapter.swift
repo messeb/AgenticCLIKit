@@ -12,7 +12,7 @@ extension Antigravity {
     /// cross-directory resume, so the adapter validates the working directory
     /// rather than assuming it works and producing a confusing failure later.
     ///
-    /// Verified against `agy` 1.0.16.
+    /// Verified against `agy` 1.1.13.
     public struct Adapter: ProcessBackedCLI {
         public static let identifier = CLIIdentifier.antigravity
 

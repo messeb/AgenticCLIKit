@@ -10,9 +10,19 @@
   <img src="docs/img/logo.png" alt="AgenticCLIKit — a terminal window orbited by the Claude, Codex, Copilot, and Antigravity marks" width="200">
 </p>
 
-A Swift library for driving locally installed agentic CLIs — Claude Code, Codex, GitHub Copilot, and Antigravity — from your own macOS app.
+<p align="center">
+  <a href="https://github.com/anthropics/claude-code"><img src="https://img.shields.io/badge/Claude_Code-2.1.224-D97757?logo=claude&logoColor=white" alt="Claude Code 2.1.224"></a>
+  <a href="https://github.com/openai/codex"><img src="https://img.shields.io/badge/Codex-0.147.0-412991?logo=openai&logoColor=white" alt="Codex 0.147.0"></a>
+  <a href="https://github.com/github/copilot-cli"><img src="https://img.shields.io/badge/GitHub_Copilot-1.0.80-24292E?logo=githubcopilot&logoColor=white" alt="GitHub Copilot 1.0.80"></a>
+  <a href="https://antigravity.google"><img src="https://img.shields.io/badge/Antigravity-1.1.13-4285F4?logo=googlegemini&logoColor=white" alt="Antigravity 1.1.13"></a>
+  <a href="https://github.com/mistralai/mistral-vibe"><img src="https://img.shields.io/badge/Mistral_Vibe-2.24.1-FA520F?logo=mistralai&logoColor=white" alt="Mistral Vibe 2.24.1"></a>
+</p>
 
-The CLIs bring their own auth, billing, sandboxing, and session persistence. This package brings the typed Swift layer: discovery, readiness, one-shot and multi-turn runs, streaming, session recovery, and typed errors — instead of four hand-rolled `Process` integrations that break on every CLI release.
+<p align="center"><sub>Supported CLIs — each badge shows the release its adapter is verified against.</sub></p>
+
+A Swift library for driving locally installed agentic CLIs — Claude Code, Codex, GitHub Copilot, Antigravity, and Mistral Vibe — from your own macOS app.
+
+The CLIs bring their own auth, billing, sandboxing, and session persistence. This package brings the typed Swift layer: discovery, readiness, one-shot and multi-turn runs, streaming, session recovery, and typed errors — instead of five hand-rolled `Process` integrations that break on every CLI release.
 
 ```swift
 let kit = AgenticCLIKit()
@@ -24,6 +34,7 @@ print(report.formattedSummary())
 // ✓ Codex 0.147.0 — authenticated via subscription
 // ✓ GitHub Copilot CLI 1.0.80 — octocat via oauth
 // ✓ Antigravity 1.1.13 — authenticated via keychain
+// ✓ Mistral Vibe 2.24.1 — authenticated via longLivedToken
 
 let response = try await kit.run(
     "Summarise the uncommitted changes",
@@ -73,29 +84,29 @@ The package also never installs, updates, or logs into anything. It reports what
 
 Capabilities are declared, not assumed. Ask for something an adapter cannot do faithfully and you get a typed error — never a silent substitution.
 
-| | Claude Code | Codex | Copilot | Antigravity |
-|---|---|---|---|---|
-| Executable | `claude` | `codex` | `copilot` | `agy` |
-| Verified against | 2.1.224 | 0.147.0 | 1.0.80 | 1.0.16, 1.1.13 |
-| Prompting | ✅ | ✅ | ✅ | ✅ |
-| Sessions / resume | ✅ | ✅ | ✅ | ✅ |
-| Resume across directories | ✅ | ✅ | ✅ | ❌ |
-| Token deltas while streaming | ✅ | ❌ (whole messages) | ✅ | ✅ |
-| Structured output | ✅ JSON / stream-json | ✅ JSONL | ✅ JSONL | ✅ JSON / stream-json |
-| Usage reporting | tokens + **USD cost** | tokens | premium requests + AI credits | tokens |
-| Per-tool allowlist | ✅ | ❌ | ✅ **patterns** | ❌ |
-| Schema-enforced output | ✅ `--json-schema` | ✅ `--output-schema` | ❌ | ✅ `--json-schema` |
-| File attachments | ✅ by path | ✅ by path | ✅ `--attachment` | ✅ by path |
-| Native image attachments | ❌ (reads from disk) | ✅ `--image` | ✅ `--attachment` | ❌ (reads from disk) |
-| Ephemeral (no session) runs | ✅ | ✅ | ❌ | ❌ |
-| Turn limits | ❌ (no `--max-turns` in 2.x) | ❌ | ❌ | ❌ |
-| Model discovery | maintained list + `--help` aliases | maintained list + `config.toml` | maintained list + `settings.json` | ✅ live catalogue (`agy models`) |
-| Auth probe | `claude auth status` (JSON) | `codex login status` | `~/.copilot/config.json` | `agy models` |
-| Status | stable | stable | stable | **experimental** |
+| | Claude Code | Codex | Copilot | Antigravity | Vibe |
+|---|---|---|---|---|---|
+| Executable | `claude` | `codex` | `copilot` | `agy` | `vibe` |
+| Verified against | 2.1.224 | 0.147.0 | 1.0.80 | 1.1.13 | 2.24.1 |
+| Prompting | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Sessions / resume | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Resume across directories | ✅ | ✅ | ✅ | ❌ | ✅ |
+| Token deltas while streaming | ✅ | ❌ (whole messages) | ✅ | ✅ | ❌ (whole messages) |
+| Structured output | ✅ JSON / stream-json | ✅ JSONL | ✅ JSONL | ✅ JSON / stream-json | ✅ NDJSON |
+| Usage reporting | tokens + **USD cost** | tokens | premium requests + AI credits | tokens | tokens + **USD cost** (from its session log) |
+| Per-tool allowlist | ✅ | ❌ | ✅ **patterns** | ❌ | ✅ **patterns** |
+| Schema-enforced output | ✅ `--json-schema` | ✅ `--output-schema` | ❌ | ✅ `--json-schema` | ❌ |
+| File attachments | ✅ by path | ✅ by path | ✅ `--attachment` | ✅ by path | ✅ by path |
+| Native image attachments | ❌ (reads from disk) | ✅ `--image` | ✅ `--attachment` | ❌ (reads from disk) | ❌ (reads from disk) |
+| Ephemeral (no session) runs | ✅ | ✅ | ❌ | ❌ | ❌ |
+| Turn limits | ❌ (no `--max-turns` in 2.x) | ❌ | ❌ | ❌ | ✅ `--max-turns` |
+| Model discovery | maintained list + `--help` aliases | maintained list + `config.toml` | maintained list + `settings.json` | ✅ live catalogue (`agy models`) | maintained list + `config.toml` |
+| Auth probe | `claude auth status` (JSON) | `codex login status` | `~/.copilot/config.json` | `agy models` | `MISTRAL_API_KEY` / `~/.vibe/.env` |
+| Status | stable | stable | stable | **experimental** | **experimental** |
 
 Note that GitHub's agent is `copilot`, not `gh`. `gh` manages repositories — issues, PRs, releases — and takes no prompts at all, so it is not an agentic CLI and is not part of this package.
 
-No adapter supports everything, and the gaps are not the same shape. Copilot streams and holds sessions but cannot constrain a reply to a schema; Antigravity has a live model catalogue but no per-tool allowlist. Ask for something an adapter cannot do faithfully and you get `.unsupportedCapability` — never a silent substitution.
+No adapter supports everything, and the gaps are not the same shape. Copilot streams and holds sessions but cannot constrain a reply to a schema; Antigravity has a live model catalogue but no per-tool allowlist; Vibe is the only one that can cap a run by turns, and the only one whose usage has to be read from a file. Ask for something an adapter cannot do faithfully and you get `.unsupportedCapability` — never a silent substitution.
 
 ---
 
@@ -113,23 +124,25 @@ public enum PermissionPolicy {
 }
 ```
 
-`planOnly`, `readOnly`, and `acceptingEdits` work on every prompting adapter. `allowingTools` requires `.toolAllowlist` — Codex and Antigravity sandbox by filesystem scope rather than by tool name, so they **refuse** it instead of quietly widening it to something broader. `unsafeBypassAll` logs at `.fault`.
+`planOnly`, `readOnly`, and `acceptingEdits` work on every prompting adapter. `allowingTools` requires `.toolAllowlist` — Claude Code, Copilot, and Vibe have it; Codex and Antigravity sandbox by filesystem scope rather than by tool name, so they **refuse** it instead of quietly widening it to something broader. `unsafeBypassAll` logs at `.fault`.
 
 How the policies land, per CLI:
 
-| Policy | `claude` | `codex` | `agy` |
-|---|---|---|---|
-| `planOnly` | `--permission-mode plan` | `--sandbox read-only` | `--mode plan` |
-| `readOnly` | `--permission-mode manual` + allow/deny lists | `--sandbox read-only` | `--mode plan --sandbox` |
-| `acceptingEdits` | `--permission-mode acceptEdits` | `--sandbox workspace-write` | `--mode accept-edits` |
-| `unsafeBypassAll` | `--dangerously-skip-permissions` | `--dangerously-bypass-approvals-and-sandbox` | `--dangerously-skip-permissions` |
+| Policy | `claude` | `codex` | `agy` | `vibe` |
+|---|---|---|---|---|
+| `planOnly` | `--permission-mode plan` | `--sandbox read-only` | `--mode plan` | `--agent plan` |
+| `readOnly` | `--permission-mode manual` + allow/deny lists | `--sandbox read-only` | `--mode plan --sandbox` | `--agent plan --auto-approve` + `--enabled-tools` allowlist |
+| `acceptingEdits` | `--permission-mode acceptEdits` | `--sandbox workspace-write` | `--mode accept-edits` | `--agent accept-edits` |
+| `unsafeBypassAll` | `--dangerously-skip-permissions` | `--dangerously-bypass-approvals-and-sandbox` | `--dangerously-skip-permissions` | `--agent auto-approve --auto-approve` |
+
+On `vibe`, `--enabled-tools` is enforcement rather than a request — in programmatic mode it disables every tool it does not name — so `readOnly` is an allowlist of the tools that only observe, not a profile that merely discourages the rest.
 
 
 ---
 
 ## Typed results, not prose
 
-Ask for a Swift record and get one. All three prompting CLIs accept a JSON Schema and constrain the model's final message to match it, so the decode is checking a contract the provider already enforced — not hoping the model remembered to reply in JSON.
+Ask for a Swift record and get one. Three of the five CLIs — `claude`, `codex`, and `agy` — accept a JSON Schema and constrain the model's final message to match it, so the decode is checking a contract the provider already enforced — not hoping the model remembered to reply in JSON.
 
 ```swift
 struct CommitMessage: StructuredOutput {
@@ -161,7 +174,7 @@ response.session                   // …including the session, for follow-ups
 
 Every property is required and `additionalProperties: false` by default; wrap a field in `.optional(_:)` to let the model omit it. `.raw(json:)` takes a hand-written schema for anything the builder does not model.
 
-A CLI that cannot enforce a schema — Copilot — throws `.unsupportedCapability(.copilot, .nativeOutputSchema)` rather than degrading to "please reply with JSON and hope". A reply that does not fit the record throws `.structuredOutputFailed(reason:text:)`, carrying the text that failed so you can log or retry with it.
+A CLI that cannot enforce a schema — Copilot and Vibe — throws `.unsupportedCapability(.copilot, .nativeOutputSchema)` rather than degrading to "please reply with JSON and hope". A reply that does not fit the record throws `.structuredOutputFailed(reason:text:)`, carrying the text that failed so you can log or retry with it.
 
 Three per-CLI details, all found by running them:
 
@@ -220,18 +233,18 @@ models.defaultModel            // preselect this
 configuration.use(ClaudeCode.Model.opus)   // or: configuration.model = "claude-opus-5"
 ```
 
-Only one of the four CLIs can genuinely enumerate its models, so `AgentModel.origin` says how much to trust each entry:
+Only one of the five CLIs can genuinely enumerate its models, so `AgentModel.origin` says how much to trust each entry:
 
 | `origin` | Meaning | Where it comes from |
 |---|---|---|
 | `.catalog` | Authoritative and complete | `agy models` — asks the backend |
-| `.bundled` | Maintained in this package | `ClaudeCode.Model`, `Codex.Model` |
-| `.configuration` | The user's own configured default | `~/.codex/config.toml` |
+| `.bundled` | Maintained in this package | `ClaudeCode.Model`, `Codex.Model`, `Vibe.Model` |
+| `.configuration` | The user's own configured default | `~/.codex/config.toml`, `~/.vibe/config.toml` |
 | `.documentation` | An alias the installed binary documents | the `--model` paragraph of `claude --help` |
 
 **Why two of them are hand-maintained.** `claude` has no command that lists models — `claude models` is taken as a *prompt*, so it spends a billable turn and answers conversationally. `codex models` exits 1 demanding a TTY. Neither output can be trusted as a catalogue, so `ClaudeCode.Model` and `Codex.Model` are ordinary enums you edit when a vendor ships a model. `Antigravity` ships no such list because it does not need one.
 
-**The list is never a constraint.** `RunConfiguration.model` is a plain `String`, so a model released after this package was tagged works immediately:
+**The list is never a constraint** — with one deliberate exception. `RunConfiguration.model` is a plain `String`, so a model released after this package was tagged works immediately:
 
 ```swift
 configuration.model = "claude-opus-6"      // no library update required
@@ -248,6 +261,8 @@ for vendor in Copilot.Model.Vendor.allCases {
 Those identifiers are exact rather than inferred: GitHub's page documents *display names*, and two of them do not regularise the way you would guess — "Gemini 3.1 Pro" is `gemini-3.1-pro-preview`, "MAI-Code-1-Flash" is `mai-code-1-flash-picker`. Note too that Copilot spells versions with dots (`claude-opus-4.8`) where the Claude Code CLI uses dashes (`claude-opus-4-8`) for the same model.
 
 **Being listed is not the same as being usable.** Copilot resolves an available set per account at launch, and every model carries terms the account holder accepts once — until then `--model` refuses it regardless of plan. On the machine this was verified against, none of the 51 catalogued models were selectable while `auto` worked throughout, which is why `auto` is the default. A refusal surfaces as `.unsupportedModel(.copilot, model:reason:)` pointing at the fix — enable the model — rather than as a generic process failure.
+
+**`vibe` is the exception, because the alternative is worse.** It has no `--model` flag — the alias travels in `VIBE_ACTIVE_MODEL` — and it addresses models by the *alias* in its `config.toml` rather than by the provider's name: the default entry is named `mistral-vibe-cli-latest` and aliased `mistral-medium-3.5`. An alias it does not recognise is **ignored**, and the run proceeds on the default model without a word. So the adapter checks the alias against `Vibe.Model` plus the user's `config.toml` and throws `.unsupportedModel(.vibe, model:reason:)` rather than letting a run bill on a model nobody chose. Adding `[[models]]` to `~/.vibe/config.toml` is enough to make a new alias acceptable — no library update.
 
 A CLI that cannot report models at all is omitted by `availableModelsByCLI()` rather than failing the whole call.
 
@@ -269,7 +284,7 @@ for try await event in kit.stream("Review this diff", using: .claudeCode, config
 }
 ```
 
-Events are deliberately **not** flattened to a lowest common denominator. Adapters map what maps cleanly and pass everything else through `.raw(Data)`, which ages far better than forcing four fast-moving CLIs into one schema.
+Events are deliberately **not** flattened to a lowest common denominator. Adapters map what maps cleanly and pass everything else through `.raw(Data)`, which ages far better than forcing five fast-moving CLIs into one schema.
 
 **To stop a run, cancel the `Task`.** Breaking out of the loop only terminates the CLI once the stream value is released — a stream held in a property keeps its agent alive.
 
@@ -400,10 +415,13 @@ Conform to `ProcessBackedCLI` and you inherit discovery, environment constructio
 
 ## Known limits
 
-- **CLI churn is the dominant risk.** All four ship breaking changes often. Adapters version-gate, degrade to typed `.unsupportedByVersion` errors rather than passing unknown flags, and keep `rawOutput` as the escape hatch.
+- **CLI churn is the dominant risk.** All five ship breaking changes often. Adapters version-gate, degrade to typed `.unsupportedByVersion` errors rather than passing unknown flags, and keep `rawOutput` as the escape hatch.
 - **Antigravity is experimental.** It is the youngest CLI here, its print-mode semantics have changed between releases, and its auth probe (`agy models`) reveals credentials work but not whose they are.
 - **Cross-directory resume for `agy` is not claimed**, because it is not documented. The adapter validates the working directory rather than letting the CLI fail confusingly later.
 - **`agy` cannot stream a schema run.** Structured output is only available in its buffered mode there, so those runs produce no incremental deltas.
+- **Vibe is experimental too.** It ships roughly weekly, and its programmatic surface is still moving.
+- **Vibe's usage comes from a file, not stdout.** Tokens and cost are read from `$VIBE_HOME/logs/session/…/meta.json` after the process exits, because `vibe` prints neither. A user who disables session logging in `config.toml` gets runs with `usage == nil` — the run itself is unaffected.
+- **Vibe's `--max-turns` counts the whole session.** The adapter reads the session's step count and offsets the limit so `maximumTurns` means the same thing as everywhere else; without a session log to read, it degrades to a stricter limit rather than refusing the run.
 - **Health-report latency** is dominated by whichever CLI checks credentials over the network. The three local ones return in ~0.9s combined; `agy` costs ~2s on its own. Pass `maximumAge:` on repeat calls.
 
 ---

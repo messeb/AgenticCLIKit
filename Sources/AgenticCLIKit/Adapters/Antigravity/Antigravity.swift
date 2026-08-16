@@ -2,7 +2,7 @@ import Foundation
 
 /// Namespace for the Antigravity (`agy`) adapter.
 ///
-/// Verified against `agy` 1.0.16. Note that `agy --help` prints a *shorter*
+/// Verified against `agy` 1.1.13. Note that `agy --help` prints a *shorter*
 /// flag list than `agy help`; the structured-output flags this adapter depends
 /// on (`--output-format`, `--mode`) appear only in the latter.
 public enum Antigravity {}

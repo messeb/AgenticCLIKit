@@ -23,13 +23,13 @@ configuration.use(ClaudeCode.Model.opus)
 
 ## Trust the origin, not just the identifier
 
-Only one of the four CLIs can genuinely enumerate its models, so every entry carries an ``AgentModel/Origin`` saying where it came from.
+Only one of the five CLIs can genuinely enumerate its models, so every entry carries an ``AgentModel/Origin`` saying where it came from.
 
 | `origin` | Meaning | Source |
 |---|---|---|
 | ``AgentModel/Origin/catalog`` | Authoritative and complete | `agy models`, which asks the backend |
-| ``AgentModel/Origin/bundled`` | Maintained in this package | ``ClaudeCode/Model``, ``Codex/Model`` |
-| ``AgentModel/Origin/configuration`` | The user's configured default | `~/.codex/config.toml` |
+| ``AgentModel/Origin/bundled`` | Maintained in this package | ``ClaudeCode/Model``, ``Codex/Model``, ``Vibe/Model`` |
+| ``AgentModel/Origin/configuration`` | The user's configured default | `~/.codex/config.toml`, `~/.vibe/config.toml` |
 | ``AgentModel/Origin/documentation`` | An alias the installed binary documents | the `--model` paragraph of `claude --help` |
 
 An app can branch on this: render a closed picker when ``Swift/Array/isCompleteCatalogue`` is `true`, and a combo box with a free-text field otherwise.
@@ -43,7 +43,13 @@ Neither `claude` nor `codex` can be asked:
 
 So ``ClaudeCode/Model`` and ``Codex/Model`` are ordinary enums, conforming to ``KnownModel``. Adding a model is adding a case. ``Antigravity`` ships no such list, because a maintained copy of a catalogue it can fetch live would only ever be a stale duplicate.
 
-Two things are still read from the machine and merged in, because they *are* knowable: the aliases `claude --help` documents, and the model in Codex's own `config.toml`.
+Three things are still read from the machine and merged in, because they *are* knowable: the aliases `claude --help` documents, the model in Codex's own `config.toml`, and the `[[models]]` aliases in Vibe's.
+
+## Vibe: aliases, and a wrong one is silent
+
+``Vibe/Model`` lists what a fresh `vibe` install ships with, and the user's `~/.vibe/config.toml` contributes the rest. Both halves matter, because `vibe` addresses models by the **alias** in that file rather than by the provider's name — the default entry is named `mistral-vibe-cli-latest` and aliased `mistral-medium-3.5`.
+
+`vibe` also has no `--model` flag. The alias travels in `VIBE_ACTIVE_MODEL`, and an alias `vibe` does not recognise is *ignored*: the run silently proceeds on the default model. ``Vibe/Adapter`` therefore checks the requested alias against the bundled list plus `config.toml` and throws ``AgenticCLIError/unsupportedModel(_:model:reason:)`` rather than letting a run bill on a model nobody chose. This is the one adapter where a model outside the list is refused — everywhere else the list is a convenience.
 
 ## The list is never a constraint
 
@@ -54,6 +60,8 @@ configuration.model = "claude-opus-6"   // no library update required
 ```
 
 This is deliberate: the enums exist to populate a picker and to document what was current, never to gate what you can run.
+
+``Vibe`` is the exception, and only because `vibe` makes the alternative worse: it ignores an alias it does not know instead of failing, so an unchecked value would run and bill on the wrong model. The check is against the user's `config.toml` as well as the bundled list, so a model added there needs no library update either — it just has to exist somewhere `vibe` will actually find it.
 
 ## CLIs without models
 

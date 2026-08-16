@@ -42,4 +42,13 @@ enum Fixture {
     static let antigravityStream = "antigravity-stream.jsonl"
     static let antigravityPrint = "antigravity-print.txt"
     static let antigravitySchema = "antigravity-schema.json"
+    // Recorded from `vibe` 2.24.1. Absolute paths and the recording machine's
+    // user name are replaced; nothing else is altered. `vibe-meta.json` keeps
+    // every field this package reads, verbatim — the CLI's own system prompt and
+    // tool schemas were dropped from it because they are Mistral's to ship, not
+    // this package's.
+    static let vibeStream = "vibe-stream.jsonl"
+    static let vibeResume = "vibe-resume.jsonl"
+    static let vibeTurnLimit = "vibe-turn-limit.jsonl"
+    static let vibeMeta = "vibe-meta.json"
 }
