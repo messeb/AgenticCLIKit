@@ -38,7 +38,7 @@ struct AgenticCLIKitFacadeTests {
         #expect(kit.agents.count == 4)
         #expect(kit[.claudeCode] != nil)
         #expect(kit[.codex] != nil)
-        #expect(kit[.github] != nil)
+        #expect(kit[.copilot] != nil)
         #expect(kit[.antigravity] != nil)
         #expect(kit["nonexistent"] == nil)
     }
@@ -47,33 +47,30 @@ struct AgenticCLIKitFacadeTests {
     /// an adapter without touching its own picker logic.
     @Test("Selects agents by capability")
     func selectsByCapability() {
-        let kit = AgenticCLIKit()
+        // Every shipped adapter prompts and holds sessions; a registered CLI
+        // that does neither must still be filtered out.
+        let kit = AgenticCLIKit(agents: AgenticCLIKit.defaultAgents() + [StubAgent()])
         let conversational = kit.agents(supporting: [.prompting, .sessions])
 
-        #expect(conversational.count == 3)
-        #expect(!conversational.contains { $0.identifier == .github })
+        #expect(conversational.count == 4)
+        #expect(!conversational.contains { $0.identifier == .stub })
+
+        // Only Copilot names individual tools.
+        let allowlisting = kit.agents(supporting: .toolAllowlist).map(\.identifier)
+        #expect(allowlisting == [.claudeCode, .copilot])
     }
 
     @Test("Health report covers every agent, in registration order")
     func buildsHealthReport() async throws {
         let kit = AgenticCLIKit(agents: [
             try makeClaudeAdapter(),
-            GitHub.Adapter(
-                runner: RecordedProcessRunner { invocation in
-                    invocation.arguments.contains("--version")
-                        ? .output("gh version 2.97.0 (2026-07-31)")
-                        : RecordedProcessRunner.Recording(
-                            standardError: Data("✓ Logged in to github.com account octocat".utf8)
-                        )
-                },
-                locator: FakeExecutableLocator()
-            ),
+            StubAgent(),
         ])
 
         let report = await kit.healthReport()
-        #expect(report.entries.map(\.cli) == [.claudeCode, .github])
+        #expect(report.entries.map(\.cli) == [.claudeCode, .stub])
         #expect(report.entries.filter(\.isReady).count == report.entries.count)
-        #expect(report.readyCLIs == [.claudeCode, .github])
+        #expect(report.readyCLIs == [.claudeCode, .stub])
         #expect(report.entries.first?.version == "2.1.224")
 
         let summary = report.formattedSummary()
@@ -164,8 +161,8 @@ struct AgenticCLIKitFacadeTests {
 
     @Test("Resuming a session-less CLI is refused by capability")
     func refusesResumeForSessionlessCLI() async {
-        let kit = AgenticCLIKit(agents: [GitHub.Adapter(locator: FakeExecutableLocator())])
-        let session = SessionReference(cli: .github, sessionID: "x", workingDirectory: workingDirectory)
+        let kit = AgenticCLIKit(agents: [StubAgent(capabilities: .prompting)])
+        let session = SessionReference(cli: .stub, sessionID: "x", workingDirectory: workingDirectory)
 
         do {
             _ = try await kit.resume(session, with: "more", configuration: configuration())

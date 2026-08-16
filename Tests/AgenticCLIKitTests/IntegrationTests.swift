@@ -36,7 +36,7 @@ struct DiscoveryIntegrationTests {
         let kit = AgenticCLIKit(agents: [
             ClaudeCode.Adapter(locator: locator),
             Codex.Adapter(locator: locator),
-            GitHub.Adapter(locator: locator),
+            Copilot.Adapter(locator: locator),
         ])
 
         let clock = ContinuousClock()
@@ -105,17 +105,51 @@ struct DiscoveryIntegrationTests {
         }
     }
 
-    @Test("gh runs a real command and returns typed JSON")
-    func runsGitHubCommand() async throws {
-        let adapter = GitHub.Adapter()
+    /// Model discovery hits the real binaries: the maintained lists are only
+    /// useful if the identifiers in them are ones the installed CLI accepts.
+    @Test("Every model-reporting CLI returns usable entries")
+    func reportsModels() async throws {
+        let kit = AgenticCLIKit()
+        for agent in kit.agents where agent.capabilities.contains(.modelDiscovery) {
+            guard await agent.installation().isInstalled else { continue }
+
+            guard let models = try? await agent.availableModels() else {
+                // `agy` needs the network and credentials for its catalogue.
+                print("\(agent.identifier): model lookup unavailable")
+                continue
+            }
+
+            #expect(!models.isEmpty, "\(agent.identifier) reported no models")
+            #expect(Set(models.map(\.id)).count == models.count, "\(agent.identifier) reported duplicates")
+            print("\(agent.identifier): \(models.count) models — \(models.prefix(3).map(\.description).joined(separator: ", "))")
+        }
+    }
+
+    /// The `--model` help paragraph is the one part of Claude's model handling
+    /// that is read from the installed binary, so a reworded help text should
+    /// show up here rather than silently returning nothing.
+    @Test("Claude still documents its model aliases in --help")
+    func claudeDocumentsAliases() async throws {
+        let adapter = ClaudeCode.Adapter()
         guard await adapter.installation().isInstalled else { return }
 
-        let configuration = RunConfiguration(
-            workingDirectory: FileManager.default.temporaryDirectory,
-            permissions: .readOnly
-        )
-        let response = try await adapter.execute(["--version"], configuration: configuration)
-        #expect(response.text.contains("gh version"))
+        let aliases = await adapter.documentedModelAliases()
+        print("claude documented aliases: \(aliases)")
+        #expect(!aliases.isEmpty, "`claude --help` no longer documents --model values")
+    }
+
+    /// Copilot cannot be asked who is logged in, so the next best assurance is
+    /// that the probe stays honest: it must never claim a logged-out user.
+    @Test("copilot reports a login state it can actually observe")
+    func probesCopilotAuthentication() async throws {
+        let adapter = Copilot.Adapter()
+        guard await adapter.installation().isInstalled else { return }
+
+        let status = await adapter.authenticationStatus()
+        print("copilot auth: \(status)")
+        // Never `.requiresLogin`: nothing available to the probe can establish
+        // that, and claiming it would send a signed-in user to a login screen.
+        #expect(!status.isBlocked)
     }
 }
 
@@ -231,6 +265,59 @@ struct LiveRunIntegrationTests {
             )
             #expect(resumed.text.contains("RESUMED"))
             #expect(resumed.session?.sessionID == session.sessionID)
+        }
+    }
+
+    /// Copilot is the only adapter that names the session itself, and the only
+    /// one whose read-only mapping is enforced by the CLI rather than
+    /// approximated — both are worth checking against the real binary.
+    @Test("Copilot runs read-only, keeps the session it named, and resumes elsewhere")
+    func copilotRunsAndResumes() async throws {
+        let adapter = Copilot.Adapter()
+        try await adapter.verifyReady()
+
+        try await withScratchDirectory { directory in
+            let configuration = RunConfiguration(
+                workingDirectory: directory,
+                permissions: .readOnly,
+                timeout: .seconds(180)
+            )
+
+            var announced: SessionReference?
+            var response: AgentResponse?
+            for try await event in adapter.stream("Reply with exactly: OK", configuration: configuration) {
+                switch event {
+                case let .sessionStarted(session): announced = announced ?? session
+                case let .finished(finished): response = finished
+                default: break
+                }
+            }
+
+            let opening = try #require(response)
+            #expect(opening.text.contains("OK"))
+
+            // The identifier was handed to `--session-id`, so the session the run
+            // reports has to be the one announced before it started.
+            let session = try #require(announced)
+            #expect(opening.session?.sessionID == session.sessionID)
+            #expect(UUID(uuidString: session.sessionID) != nil)
+
+            // Resume from somewhere else entirely: sessions are stored globally,
+            // not per directory.
+            let elsewhere = RunConfiguration(
+                workingDirectory: FileManager.default.temporaryDirectory,
+                permissions: .readOnly,
+                timeout: .seconds(180)
+            )
+            let resumed = try await adapter.resume(
+                session,
+                with: "Reply with exactly: RESUMED",
+                configuration: elsewhere
+            )
+            #expect(resumed.text.contains("RESUMED"))
+            #expect(resumed.session?.sessionID == session.sessionID)
+            // Copilot bills in its own units; at least one has to come back.
+            #expect(resumed.usage?.premiumRequests != nil || resumed.usage?.aiCredits != nil)
         }
     }
 

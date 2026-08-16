@@ -11,7 +11,7 @@ AgenticCLIKit works by spawning the user's own CLI binaries. Under the macOS App
 | Developer ID (direct download) | ✅ |
 | Mac App Store | ❌ |
 | Command-line tools and scripts | ✅ |
-| Server-side Swift on Linux | Partially — `gh` and `codex` only |
+| Server-side Swift on Linux | Partially — `codex` and `copilot` only |
 
 This is a platform constraint, not a limitation of the implementation. An app that needs App Store distribution needs a different architecture: talk to the vendor APIs directly, or move the execution into a separately distributed helper.
 

@@ -1,6 +1,6 @@
 # ``AgenticCLIKit``
 
-Drive locally installed AI agent CLIs — Claude Code, Codex, Antigravity — and the GitHub CLI from a macOS app.
+Drive locally installed AI agent CLIs — Claude Code, Codex, GitHub Copilot, and Antigravity — from a macOS app.
 
 ## Overview
 
@@ -32,6 +32,12 @@ let response = try await kit.run(
 - ``AgentResponse``
 - ``AgentEvent``
 - ``AgentEventStream``
+
+### Choosing a model
+
+- <doc:Models>
+- ``AgentModel``
+- ``KnownModel``
 
 ### Deciding what an agent may do
 
@@ -69,7 +75,7 @@ let response = try await kit.run(
 - ``AuthenticationStatus``
 - ``ClaudeCode``
 - ``Codex``
-- ``GitHub``
+- ``Copilot``
 - ``Antigravity``
 
 ### Extending the kit

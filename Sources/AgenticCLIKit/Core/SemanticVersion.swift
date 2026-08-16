@@ -3,7 +3,7 @@ import Foundation
 /// A semantic version, parsed leniently from whatever a CLI prints for `--version`.
 ///
 /// Real CLIs decorate their version output (`"2.1.224 (Claude Code)"`,
-/// `"codex-cli 0.147.0"`, `"gh version 2.97.0 (2026-07-31)"`), so
+/// `"codex-cli 0.147.0"`, `"GitHub Copilot CLI 1.0.80"`), so
 /// ``init(parsingFirstMatchIn:)`` scans for the first version-shaped token
 /// instead of demanding a clean string.
 public struct SemanticVersion: Hashable, Sendable, Codable {

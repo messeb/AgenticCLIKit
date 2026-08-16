@@ -205,9 +205,9 @@ struct ErrorTests {
 
     @Test("Blocked states carry an actionable next step")
     func carriesRecovery() {
-        let error = AgenticCLIError.notAuthenticated(.github, loginCommand: "gh auth login")
-        #expect(error.recoverySuggestion?.contains("gh auth login") == true)
-        #expect(error.localizedDescription.contains("gh auth login"))
+        let error = AgenticCLIError.notAuthenticated(.copilot, loginCommand: "copilot login")
+        #expect(error.recoverySuggestion?.contains("copilot login") == true)
+        #expect(error.localizedDescription.contains("copilot login"))
         #expect(!error.isTransient)
         #expect(AgenticCLIError.timedOut(.codex, after: .seconds(5)).isTransient)
     }

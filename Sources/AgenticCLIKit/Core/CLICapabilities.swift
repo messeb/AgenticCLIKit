@@ -14,7 +14,7 @@ public struct CLICapabilities: OptionSet, Hashable, Sendable, Codable {
     }
 
     /// Accepts a free-form prompt and produces an agent response.
-    /// `gh`, for instance, does not.
+    /// Not every CLI does.
     public static let prompting = CLICapabilities(rawValue: 1 << 0)
     /// Creates resumable sessions and can continue them from a later process.
     public static let sessions = CLICapabilities(rawValue: 1 << 1)
@@ -46,6 +46,9 @@ public struct CLICapabilities: OptionSet, Hashable, Sendable, Codable {
     /// Has a dedicated flag for attaching images, rather than relying on the
     /// agent opening them from disk.
     public static let nativeImageAttachments = CLICapabilities(rawValue: 1 << 15)
+    /// Can report the models it accepts — from its own catalogue, its
+    /// configuration, or a list this package maintains. See ``AgentModel/Origin``.
+    public static let modelDiscovery = CLICapabilities(rawValue: 1 << 16)
     /// The adapter tracks a young or fast-moving CLI; expect breakage.
     public static let experimental = CLICapabilities(rawValue: 1 << 11)
 }
@@ -67,6 +70,7 @@ extension CLICapabilities: CustomStringConvertible {
         (.nativeOutputSchema, "nativeOutputSchema"),
         (.fileAttachments, "fileAttachments"),
         (.nativeImageAttachments, "nativeImageAttachments"),
+        (.modelDiscovery, "modelDiscovery"),
         (.experimental, "experimental"),
     ]
 

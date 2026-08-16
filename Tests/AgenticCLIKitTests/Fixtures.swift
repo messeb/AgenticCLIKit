@@ -35,6 +35,8 @@ enum Fixture {
     static let codexStream = "codex-stream.jsonl"
     static let codexResume = "codex-resume.jsonl"
     static let codexSchema = "codex-schema.jsonl"
+    // Recorded from GitHub Copilot CLI 1.0.80
+    static let copilotStream = "copilot-stream.jsonl"
     // Recorded from `agy` 1.0.16
     static let antigravityResult = "antigravity-result.json"
     static let antigravityStream = "antigravity-stream.jsonl"

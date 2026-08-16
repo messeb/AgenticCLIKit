@@ -40,7 +40,7 @@ extension Antigravity {
             [
                 .prompting, .sessions, .streaming, .structuredOutput,
                 .modelSelection, .usageReporting, .additionalDirectories,
-                .nativeOutputSchema, .fileAttachments, .experimental,
+                .nativeOutputSchema, .fileAttachments, .modelDiscovery, .experimental,
             ]
         }
 
@@ -76,6 +76,61 @@ extension Antigravity {
             // A model list means the backend accepted our credentials, but it
             // discloses no account identity.
             return .authenticated(AuthenticatedAccount(method: .keychain))
+        }
+
+        // MARK: - Models
+
+        /// The live model catalogue from `agy models`.
+        ///
+        /// The only one of the four CLIs that can genuinely enumerate its
+        /// models: `agy models` asks the backend and prints `id⇥Display Name`
+        /// per line. That makes this list authoritative and complete — safe to
+        /// render as an exhaustive picker — so this adapter ships no
+        /// hand-maintained fallback. The trade-off is that it needs the network
+        /// and valid credentials; without them it throws rather than guessing.
+        public func availableModels() async throws -> [AgentModel] {
+            guard let result = await probe(["models"]) else {
+                throw AgenticCLIError.notInstalled(Self.identifier, installHint: installHint)
+            }
+            guard result.exit.isSuccess else {
+                throw Translator.mapFailure(
+                    exit: result.exit,
+                    standardError: result.standardErrorText,
+                    session: nil
+                )
+            }
+
+            let models = Self.parseModels(result.standardOutputText)
+            guard !models.isEmpty else {
+                throw AgenticCLIError.malformedOutput(
+                    reason: "`agy models` produced no recognisable entries",
+                    raw: result.standardOutput
+                )
+            }
+            return models
+        }
+
+        /// Parses the tab-separated `id⇥Display Name` lines `agy models` prints.
+        ///
+        /// The command also emits progress chatter ("Fetching available
+        /// models…") that carries no tab, which is how those lines are told
+        /// apart from entries.
+        static func parseModels(_ output: String) -> [AgentModel] {
+            var models: [AgentModel] = []
+            for rawLine in output.split(separator: "\n") {
+                let line = rawLine.trimmingCharacters(in: .whitespaces)
+                guard !line.isEmpty else { continue }
+
+                let fields = line.split(separator: "\t", maxSplits: 1).map {
+                    $0.trimmingCharacters(in: .whitespaces)
+                }
+                guard fields.count == 2, !fields[0].isEmpty, !fields[0].contains(" ") else { continue }
+
+                models.append(
+                    AgentModel(id: fields[0], displayName: fields[1], origin: .catalog)
+                )
+            }
+            return models
         }
 
         // MARK: - Running

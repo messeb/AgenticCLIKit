@@ -64,7 +64,7 @@ Decoding prefers the CLI's structured field over the message text. That order ma
 
 ``AgenticCLIError/structuredOutputFailed(reason:text:)`` carries the text that failed, so it can be logged or retried.
 
-A CLI that cannot enforce a schema — `gh` — throws ``AgenticCLIError/unsupportedCapability(_:_:)`` rather than degrading to "please reply with JSON and hope".
+A CLI that cannot enforce a schema — Copilot, which streams JSON but has no flag that constrains the reply — throws ``AgenticCLIError/unsupportedCapability(_:_:)`` rather than degrading to "please reply with JSON and hope".
 
 ## Without a Swift type
 

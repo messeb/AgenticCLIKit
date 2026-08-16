@@ -3,8 +3,9 @@ import Foundation
 /// Token and cost accounting for a turn, normalised across CLIs.
 ///
 /// Every field is optional because coverage differs: Claude Code reports cost in
-/// USD, Codex and Antigravity report tokens only, `gh` reports nothing. Raw
-/// vendor payloads remain available on ``AgentResponse/rawOutput``.
+/// USD, Codex and Antigravity report tokens only, Copilot reports neither tokens
+/// nor dollars but its own billing units. Raw vendor payloads remain available
+/// on ``AgentResponse/rawOutput``.
 public struct UsageInfo: Hashable, Sendable, Codable {
     public var inputTokens: Int?
     public var outputTokens: Int?
@@ -16,6 +17,14 @@ public struct UsageInfo: Hashable, Sendable, Codable {
     public var reasoningTokens: Int?
     /// Cost in USD, only when the CLI computes it.
     public var costUSD: Double?
+    /// Requests billed against a subscription's premium-request quota.
+    ///
+    /// Copilot's billing unit. It is not convertible to ``costUSD`` — what a
+    /// premium request costs depends on the user's plan — so it is reported as
+    /// its own quantity rather than folded into a dollar figure.
+    public var premiumRequests: Int?
+    /// Copilot AI credits consumed, in whole credits.
+    public var aiCredits: Double?
     public var turns: Int?
     public var model: String?
     /// Wall-clock duration the CLI itself reported, which may exclude startup.
@@ -28,6 +37,8 @@ public struct UsageInfo: Hashable, Sendable, Codable {
         cacheWriteTokens: Int? = nil,
         reasoningTokens: Int? = nil,
         costUSD: Double? = nil,
+        premiumRequests: Int? = nil,
+        aiCredits: Double? = nil,
         turns: Int? = nil,
         model: String? = nil,
         duration: Duration? = nil
@@ -38,6 +49,8 @@ public struct UsageInfo: Hashable, Sendable, Codable {
         self.cacheWriteTokens = cacheWriteTokens
         self.reasoningTokens = reasoningTokens
         self.costUSD = costUSD
+        self.premiumRequests = premiumRequests
+        self.aiCredits = aiCredits
         self.turns = turns
         self.model = model
         self.duration = duration
@@ -51,7 +64,8 @@ public struct UsageInfo: Hashable, Sendable, Codable {
 
     private enum CodingKeys: String, CodingKey {
         case inputTokens, outputTokens, cachedInputTokens, cacheWriteTokens
-        case reasoningTokens, costUSD, turns, model, durationSeconds
+        case reasoningTokens, costUSD, premiumRequests, aiCredits
+        case turns, model, durationSeconds
     }
 
     public init(from decoder: any Decoder) throws {
@@ -62,6 +76,8 @@ public struct UsageInfo: Hashable, Sendable, Codable {
         cacheWriteTokens = try container.decodeIfPresent(Int.self, forKey: .cacheWriteTokens)
         reasoningTokens = try container.decodeIfPresent(Int.self, forKey: .reasoningTokens)
         costUSD = try container.decodeIfPresent(Double.self, forKey: .costUSD)
+        premiumRequests = try container.decodeIfPresent(Int.self, forKey: .premiumRequests)
+        aiCredits = try container.decodeIfPresent(Double.self, forKey: .aiCredits)
         turns = try container.decodeIfPresent(Int.self, forKey: .turns)
         model = try container.decodeIfPresent(String.self, forKey: .model)
         duration = try container.decodeIfPresent(Double.self, forKey: .durationSeconds).map(Duration.seconds)
@@ -75,6 +91,8 @@ public struct UsageInfo: Hashable, Sendable, Codable {
         try container.encodeIfPresent(cacheWriteTokens, forKey: .cacheWriteTokens)
         try container.encodeIfPresent(reasoningTokens, forKey: .reasoningTokens)
         try container.encodeIfPresent(costUSD, forKey: .costUSD)
+        try container.encodeIfPresent(premiumRequests, forKey: .premiumRequests)
+        try container.encodeIfPresent(aiCredits, forKey: .aiCredits)
         try container.encodeIfPresent(turns, forKey: .turns)
         try container.encodeIfPresent(model, forKey: .model)
         try container.encodeIfPresent(duration.map(\.seconds), forKey: .durationSeconds)

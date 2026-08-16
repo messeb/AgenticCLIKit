@@ -22,6 +22,9 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 - `PermissionPolicy` as a required, explicit choice on every run.
 - `HealthReport` for status screens and bug reports, with concurrent probes and optional caching.
 - `AgenticCLIKitTesting` with `RecordedProcessRunner` for testing against recorded CLI transcripts.
+- Model discovery: `AgentModel`, `KnownModel`, and `availableModels()`, backed by
+  Antigravity's live catalogue and hand-maintained lists for the two CLIs that
+  cannot enumerate their models.
 - `agentickit` demo command-line tool.
 
 [Unreleased]: https://github.com/messeb/AgenticCLIKit/commits/main

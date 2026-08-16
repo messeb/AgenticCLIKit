@@ -44,7 +44,7 @@ extension Codex {
                 .prompting, .sessions, .streaming, .structuredOutput,
                 .modelSelection, .usageReporting, .resumeAcrossDirectories,
                 .ephemeralRuns, .additionalDirectories, .nativeOutputSchema,
-                .fileAttachments, .nativeImageAttachments,
+                .fileAttachments, .nativeImageAttachments, .modelDiscovery,
             ]
         }
 
@@ -100,6 +100,77 @@ extension Codex {
                 .split(whereSeparator: { $0 == " " || $0 == "\n" })
                 .map(String.init)
                 .first { $0.contains("@") && $0.contains(".") }
+        }
+
+        // MARK: - Models
+
+        /// The maintained ``Codex/Model`` list, with the user's configured model
+        /// marked as the default.
+        ///
+        /// `codex` cannot enumerate models — `codex models` exits 1 demanding a
+        /// TTY — so the maintained list is the catalogue. The configured value
+        /// from `config.toml` is merged in because it is the one fact about this
+        /// machine that *is* knowable, and it is what a run without an explicit
+        /// model will actually use.
+        public func availableModels() async throws -> [AgentModel] {
+            let configured = configuredModel()
+
+            var models = Model.agentModels.map { model in
+                guard let configured else { return model }
+                // The user's configuration outranks the list's own default.
+                return AgentModel(
+                    id: model.id,
+                    displayName: model.displayName,
+                    summary: model.summary,
+                    isDefault: model.id == configured,
+                    origin: model.origin
+                )
+            }
+
+            if let configured, !models.contains(where: { $0.id == configured }) {
+                models.insert(
+                    AgentModel(
+                        id: configured,
+                        summary: "Configured in config.toml",
+                        isDefault: true,
+                        origin: .configuration
+                    ),
+                    at: 0
+                )
+            }
+            return models
+        }
+
+        /// The `model` value from `$CODEX_HOME/config.toml`, when set.
+        ///
+        /// Only the top-level assignment counts: `model` also appears inside
+        /// profile tables, and those describe other profiles, not this run.
+        public func configuredModel() -> String? {
+            let home = hostEnvironment["CODEX_HOME"].map { URL(fileURLWithPath: $0) }
+                ?? FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent(".codex")
+            let configURL = home.appendingPathComponent("config.toml")
+
+            guard let contents = try? String(contentsOf: configURL, encoding: .utf8) else { return nil }
+            return Self.parseModel(fromTOML: contents)
+        }
+
+        static func parseModel(fromTOML toml: String) -> String? {
+            for rawLine in toml.split(separator: "\n", omittingEmptySubsequences: false) {
+                let line = rawLine.trimmingCharacters(in: .whitespaces)
+                // Stop at the first table header — everything after belongs to a
+                // section, not to the top-level configuration.
+                if line.hasPrefix("[") { return nil }
+                guard line.hasPrefix("model"), let equals = line.firstIndex(of: "=") else { continue }
+
+                let key = line[line.startIndex..<equals].trimmingCharacters(in: .whitespaces)
+                guard key == "model" else { continue }
+
+                let value = line[line.index(after: equals)...]
+                    .trimmingCharacters(in: .whitespaces)
+                    .trimmingCharacters(in: CharacterSet(charactersIn: "\"'"))
+                return value.isEmpty ? nil : value
+            }
+            return nil
         }
 
         // MARK: - Running

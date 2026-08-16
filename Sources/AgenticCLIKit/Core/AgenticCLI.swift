@@ -34,6 +34,11 @@ public protocol AgenticCLI: Sendable {
     /// Never opens a browser.
     func authenticationStatus() async -> AuthenticationStatus
 
+    /// Models this CLI accepts. Declared here, not only in an extension: a
+    /// witness supplied by an extension alone is never dispatched to through
+    /// `any AgenticCLI`, so the facade would silently get the default.
+    func availableModels() async throws -> [AgentModel]
+
     /// Starts a new conversation.
     func stream(_ prompt: String, configuration: RunConfiguration) -> AgentEventStream
 

@@ -27,8 +27,7 @@ jobs:
 
       - name: Install CLIs
         run: |
-          npm install -g @anthropic-ai/claude-code @openai/codex
-          brew install gh
+          npm install -g @anthropic-ai/claude-code @openai/codex @github/copilot
           # `agy` has no unattended installer; the Antigravity adapter is
           # skipped here and covered by the local integration suite.
 
@@ -37,7 +36,7 @@ jobs:
         run: |
           {
             echo 'report<<EOF'
-            for cli in claude codex gh; do
+            for cli in claude codex copilot; do
               printf '%s: ' "$cli"
               "$cli" --version 2>&1 | head -1 || echo "not installed"
             done

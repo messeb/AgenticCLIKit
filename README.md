@@ -6,7 +6,7 @@
 [![Platform](https://img.shields.io/badge/platform-macOS%2013%2B-lightgrey.svg)](https://developer.apple.com/macos/)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-A Swift library for driving locally installed agentic CLIs — Claude Code, Codex, Antigravity — and the GitHub CLI, from your own macOS app.
+A Swift library for driving locally installed agentic CLIs — Claude Code, Codex, GitHub Copilot, and Antigravity — from your own macOS app.
 
 The CLIs bring their own auth, billing, sandboxing, and session persistence. This package brings the typed Swift layer: discovery, readiness, one-shot and multi-turn runs, streaming, session recovery, and typed errors — instead of four hand-rolled `Process` integrations that break on every CLI release.
 
@@ -18,7 +18,7 @@ let report = await kit.healthReport()
 print(report.formattedSummary())
 // ✓ Claude Code 2.1.224 — sebastian@example.com via subscription
 // ✓ Codex 0.147.0 — authenticated via subscription
-// ✓ GitHub CLI 2.97.0 — octocat via oauth
+// ✓ GitHub Copilot CLI 1.0.80 — octocat via oauth
 // ✓ Antigravity 1.1.13 — authenticated via keychain
 
 let response = try await kit.run(
@@ -51,7 +51,7 @@ The package also never installs, updates, or logs into anything. It reports what
 
 ## Requirements
 
-- macOS 13+ (Linux builds, but only `gh` and `codex` are meaningful there)
+- macOS 13+ (Linux builds, but only `codex` and `copilot` are meaningful there)
 - Swift 6.0+, strict concurrency, `Sendable`-clean public API
 - **Zero third-party dependencies** — Foundation and `os` only
 
@@ -69,26 +69,29 @@ The package also never installs, updates, or logs into anything. It reports what
 
 Capabilities are declared, not assumed. Ask for something an adapter cannot do faithfully and you get a typed error — never a silent substitution.
 
-| | Claude Code | Codex | GitHub | Antigravity |
+| | Claude Code | Codex | Copilot | Antigravity |
 |---|---|---|---|---|
-| Executable | `claude` | `codex` | `gh` | `agy` |
-| Verified against | 2.1.224 | 0.147.0 | 2.97.0 | 1.0.16, 1.1.13 |
-| Prompting | ✅ | ✅ | ❌ | ✅ |
-| Sessions / resume | ✅ | ✅ | ❌ | ✅ |
-| Resume across directories | ✅ | ✅ | — | ❌ |
-| Token deltas while streaming | ✅ | ❌ (whole messages) | — | ✅ |
-| Structured output | ✅ JSON / stream-json | ✅ JSONL | ✅ `--json` | ✅ JSON / stream-json |
-| Usage reporting | tokens + **USD cost** | tokens | — | tokens |
-| Per-tool allowlist | ✅ | ❌ | — | ❌ |
-| Schema-enforced output | ✅ `--json-schema` | ✅ `--output-schema` | — | ✅ `--json-schema` |
-| File attachments | ✅ by path | ✅ by path | — | ✅ by path |
-| Native image attachments | ❌ (reads from disk) | ✅ `--image` | — | ❌ (reads from disk) |
-| Ephemeral (no session) runs | ✅ | ✅ | — | ❌ |
-| Turn limits | ❌ (no `--max-turns` in 2.x) | ❌ | — | ❌ |
-| Auth probe | `claude auth status` (JSON) | `codex login status` | `gh auth status` | `agy models` |
+| Executable | `claude` | `codex` | `copilot` | `agy` |
+| Verified against | 2.1.224 | 0.147.0 | 1.0.80 | 1.0.16, 1.1.13 |
+| Prompting | ✅ | ✅ | ✅ | ✅ |
+| Sessions / resume | ✅ | ✅ | ✅ | ✅ |
+| Resume across directories | ✅ | ✅ | ✅ | ❌ |
+| Token deltas while streaming | ✅ | ❌ (whole messages) | ✅ | ✅ |
+| Structured output | ✅ JSON / stream-json | ✅ JSONL | ✅ JSONL | ✅ JSON / stream-json |
+| Usage reporting | tokens + **USD cost** | tokens | premium requests + AI credits | tokens |
+| Per-tool allowlist | ✅ | ❌ | ✅ **patterns** | ❌ |
+| Schema-enforced output | ✅ `--json-schema` | ✅ `--output-schema` | ❌ | ✅ `--json-schema` |
+| File attachments | ✅ by path | ✅ by path | ✅ `--attachment` | ✅ by path |
+| Native image attachments | ❌ (reads from disk) | ✅ `--image` | ✅ `--attachment` | ❌ (reads from disk) |
+| Ephemeral (no session) runs | ✅ | ✅ | ❌ | ❌ |
+| Turn limits | ❌ (no `--max-turns` in 2.x) | ❌ | ❌ | ❌ |
+| Model discovery | maintained list + `--help` aliases | maintained list + `config.toml` | maintained list + `settings.json` | ✅ live catalogue (`agy models`) |
+| Auth probe | `claude auth status` (JSON) | `codex login status` | `~/.copilot/config.json` | `agy models` |
 | Status | stable | stable | stable | **experimental** |
 
-`gh` is in the package deliberately. An abstraction whose members all behave the same way is untested; keeping a capability-poor adapter in the core forces every call site to respect `CLICapabilities` rather than assuming everything is Claude-shaped. Call `run` on it and you get `.unsupportedCapability(.github, .prompting)`. Use `GitHub.Adapter.execute(_:configuration:)` and `decodeJSON(_:as:configuration:)` instead.
+Note that GitHub's agent is `copilot`, not `gh`. `gh` manages repositories — issues, PRs, releases — and takes no prompts at all, so it is not an agentic CLI and is not part of this package.
+
+No adapter supports everything, and the gaps are not the same shape. Copilot streams and holds sessions but cannot constrain a reply to a schema; Antigravity has a live model catalogue but no per-tool allowlist. Ask for something an adapter cannot do faithfully and you get `.unsupportedCapability` — never a silent substitution.
 
 ---
 
@@ -154,7 +157,7 @@ response.session                   // …including the session, for follow-ups
 
 Every property is required and `additionalProperties: false` by default; wrap a field in `.optional(_:)` to let the model omit it. `.raw(json:)` takes a hand-written schema for anything the builder does not model.
 
-A CLI that cannot enforce a schema — `gh` — throws `.unsupportedCapability` rather than degrading to "please reply with JSON and hope". A reply that does not fit the record throws `.structuredOutputFailed(reason:text:)`, carrying the text that failed so you can log or retry with it.
+A CLI that cannot enforce a schema — Copilot — throws `.unsupportedCapability(.copilot, .nativeOutputSchema)` rather than degrading to "please reply with JSON and hope". A reply that does not fit the record throws `.structuredOutputFailed(reason:text:)`, carrying the text that failed so you can log or retry with it.
 
 Three per-CLI details, all found by running them:
 
@@ -189,7 +192,60 @@ What happens for each kind:
 
 Every attachment is then announced to the agent in a preamble listing absolute paths and your descriptions, and any directory outside the working directory is granted with the CLI's own `--add-dir`. Codex additionally passes images through its native `--image` flag.
 
-Guardrails: a missing file, a directory, a non-HTTP URL, or anything over `maximumAttachmentBytes` (32 MB default) fails *before* the CLI is spawned, with a typed error. Caller-supplied filenames are sanitised so they cannot escape the scratch directory. `gh`, which cannot read attachments, throws `.unsupportedCapability`.
+Guardrails: a missing file, a directory, a non-HTTP URL, or anything over `maximumAttachmentBytes` (32 MB default) fails *before* the CLI is spawned, with a typed error. Caller-supplied filenames are sanitised so they cannot escape the scratch directory. An adapter that cannot read attachments throws `.unsupportedCapability` instead of dropping them.
+
+
+---
+
+## Choosing a model
+
+Leave it alone and the CLI uses whatever the user configured — no `--model` flag is sent, so the library never overrides their choice:
+
+```swift
+var configuration = RunConfiguration.readOnly(in: repositoryURL)
+configuration.model            // nil — the CLI's own default wins
+```
+
+To pick one, ask what the installed CLI actually offers:
+
+```swift
+let models = try await kit.availableModels(for: .antigravity)
+models.isCompleteCatalogue     // true — safe to render as an exhaustive picker
+models.defaultModel            // preselect this
+
+configuration.use(ClaudeCode.Model.opus)   // or: configuration.model = "claude-opus-5"
+```
+
+Only one of the four CLIs can genuinely enumerate its models, so `AgentModel.origin` says how much to trust each entry:
+
+| `origin` | Meaning | Where it comes from |
+|---|---|---|
+| `.catalog` | Authoritative and complete | `agy models` — asks the backend |
+| `.bundled` | Maintained in this package | `ClaudeCode.Model`, `Codex.Model` |
+| `.configuration` | The user's own configured default | `~/.codex/config.toml` |
+| `.documentation` | An alias the installed binary documents | the `--model` paragraph of `claude --help` |
+
+**Why two of them are hand-maintained.** `claude` has no command that lists models — `claude models` is taken as a *prompt*, so it spends a billable turn and answers conversationally. `codex models` exits 1 demanding a TTY. Neither output can be trusted as a catalogue, so `ClaudeCode.Model` and `Codex.Model` are ordinary enums you edit when a vendor ships a model. `Antigravity` ships no such list because it does not need one.
+
+**The list is never a constraint.** `RunConfiguration.model` is a plain `String`, so a model released after this package was tagged works immediately:
+
+```swift
+configuration.model = "claude-opus-6"      // no library update required
+```
+
+`Copilot.Model` carries GitHub's [supported models](https://docs.github.com/en/copilot/reference/ai-models/supported-models) — 27 entries across OpenAI, Anthropic, Google, Microsoft, and Moonshot, grouped by `.vendor` so a picker need not render one flat list:
+
+```swift
+for vendor in Copilot.Model.Vendor.allCases {
+    print(vendor.rawValue, Copilot.Model.models(from: vendor).map(\.displayName))
+}
+```
+
+Those identifiers are exact rather than inferred: GitHub's page documents *display names*, and two of them do not regularise the way you would guess — "Gemini 3.1 Pro" is `gemini-3.1-pro-preview`, "MAI-Code-1-Flash" is `mai-code-1-flash-picker`. Note too that Copilot spells versions with dots (`claude-opus-4.8`) where the Claude Code CLI uses dashes (`claude-opus-4-8`) for the same model.
+
+**Being listed is not the same as being usable.** Copilot resolves an available set per account at launch, and every model carries terms the account holder accepts once — until then `--model` refuses it regardless of plan. On the machine this was verified against, none of the 51 catalogued models were selectable while `auto` worked throughout, which is why `auto` is the default. A refusal surfaces as `.unsupportedModel(.copilot, model:reason:)` pointing at the fix — enable the model — rather than as a generic process failure.
+
+A CLI that cannot report models at all is omitted by `availableModelsByCLI()` rather than failing the whole call.
 
 ---
 
@@ -309,9 +365,9 @@ AGENTICCLIKIT_LIVE=1 swift test              # + real agent turns (spends your t
 swift run agentickit health
 swift run agentickit run claude-code "What does this package do?" --permissions readOnly --stream
 swift run agentickit continue codex "Keep going"
+swift run agentickit models
 swift run agentickit commit-message claude-code
 swift run agentickit run claude-code "Summarise it" --attach report.pdf --attach https://example.com/spec.pdf
-swift run agentickit gh pr list --json number,title
 swift run agentickit sessions
 ```
 

@@ -349,10 +349,7 @@ struct AttachmentTests {
     func refusesAttachmentsWithoutCapability() async throws {
         try await withScratchDirectory { directory in
             let file = try writeFile("x", named: "a.txt", in: directory)
-            let adapter = GitHub.Adapter(
-                runner: RecordedProcessRunner(always: .output("")),
-                locator: FakeExecutableLocator()
-            )
+            let adapter = CapabilityFreeAgent()
             #expect(!adapter.capabilities.contains(.fileAttachments))
 
             await #expect(throws: AgenticCLIError.self) {
@@ -422,4 +419,53 @@ final class StubURLProtocol: URLProtocol, @unchecked Sendable {
     }
 
     override func stopLoading() {}
+}
+
+/// A process-backed adapter that declares no capabilities at all.
+///
+/// The refusal it exercises lives in ``ProcessBackedCLI/prepareRun``, shared by
+/// every adapter — and every shipped adapter now reads files, so testing that
+/// branch needs a CLI that does not. Keeping the double here, rather than in
+/// `AgenticCLIKitTesting`, is deliberate: `prepareRun` is internal, so only a
+/// `@testable` consumer can reach it.
+private struct CapabilityFreeAgent: ProcessBackedCLI {
+    static let identifier = CLIIdentifier("capability-free")
+
+    let runner: any ProcessRunner = RecordedProcessRunner(always: .output(""))
+    let locator: any ExecutableLocating = FakeExecutableLocator()
+
+    var displayName: String { "Capability-free" }
+    var executableName: String { "capability-free" }
+    var installHint: String { "Not a real CLI" }
+    var loginCommand: String { "true" }
+    var minimumSupportedVersion: SemanticVersion { SemanticVersion(1, 0, 0) }
+    var capabilities: CLICapabilities { [] }
+    var environmentPolicy: EnvironmentPolicy { .base }
+
+    func authenticationStatus() async -> AuthenticationStatus {
+        .authenticated(AuthenticatedAccount(method: .keychain))
+    }
+
+    func stream(_ prompt: String, configuration: RunConfiguration) -> AgentEventStream {
+        AgentEventStream { continuation in
+            let task = Task {
+                do {
+                    let prepared = try await prepareRun(prompt: prompt, configuration: configuration)
+                    prepared.workspace?.destroy()
+                    continuation.finish()
+                } catch {
+                    continuation.finish(throwing: error)
+                }
+            }
+            continuation.onTermination = { _ in task.cancel() }
+        }
+    }
+
+    func stream(
+        resuming session: SessionReference,
+        prompt: String,
+        configuration: RunConfiguration
+    ) -> AgentEventStream {
+        stream(prompt, configuration: configuration)
+    }
 }

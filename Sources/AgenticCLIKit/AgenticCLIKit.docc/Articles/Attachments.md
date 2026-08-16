@@ -39,7 +39,7 @@ All of these fail *before* the CLI is spawned, with a typed error:
 
 Caller-supplied filenames are sanitised so they cannot escape the scratch directory.
 
-`gh` cannot read attachments and declares no ``CLICapabilities/fileAttachments``, so it throws ``AgenticCLIError/unsupportedCapability(_:_:)``.
+Copilot takes both images and documents through the same `--attachment` flag, so nothing has to be described in the prompt for it. An adapter that declares no ``CLICapabilities/fileAttachments`` throws ``AgenticCLIError/unsupportedCapability(_:_:)`` rather than dropping the files.
 
 ## Folders
 

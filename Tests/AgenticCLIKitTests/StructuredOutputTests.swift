@@ -242,10 +242,7 @@ struct StructuredRunTests {
 
     @Test("A CLI that cannot enforce a schema refuses the run")
     func refusesWithoutNativeSchemaSupport() async {
-        let adapter = GitHub.Adapter(
-            runner: RecordedProcessRunner(always: .output("")),
-            locator: FakeExecutableLocator()
-        )
+        let adapter = StubAgent(capabilities: [.prompting, .sessions])
         #expect(!adapter.capabilities.contains(.nativeOutputSchema))
 
         do {
@@ -262,11 +259,15 @@ struct StructuredRunTests {
         }
     }
 
-    @Test("All three prompting adapters can enforce a schema")
+    /// Copilot is the exception among the shipped adapters: it prompts and
+    /// streams JSON, but has no flag that constrains the reply to a schema, so
+    /// it is excluded rather than served by a best-effort prompt instruction.
+    @Test("Only adapters that can enforce a schema are offered for typed runs")
     func promptingAdaptersSupportSchemas() {
         let kit = AgenticCLIKit()
         let supported: Set<CLIIdentifier> = Set(kit.structuredOutputAgents.map(\.identifier))
         #expect(supported == Set([CLIIdentifier.claudeCode, .codex, .antigravity]))
+        #expect(!supported.contains(.copilot))
     }
 
     // MARK: - Failure reporting
