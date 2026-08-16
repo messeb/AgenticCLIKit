@@ -6,6 +6,10 @@
 [![Platform](https://img.shields.io/badge/platform-macOS%2013%2B-lightgrey.svg)](https://developer.apple.com/macos/)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
+<p align="center">
+  <img src="docs/img/logo.png" alt="AgenticCLIKit — a terminal window orbited by the Claude, Codex, Copilot, and Antigravity marks" width="200">
+</p>
+
 A Swift library for driving locally installed agentic CLIs — Claude Code, Codex, GitHub Copilot, and Antigravity — from your own macOS app.
 
 The CLIs bring their own auth, billing, sandboxing, and session persistence. This package brings the typed Swift layer: discovery, readiness, one-shot and multi-turn runs, streaming, session recovery, and typed errors — instead of four hand-rolled `Process` integrations that break on every CLI release.
