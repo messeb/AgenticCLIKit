@@ -10,6 +10,12 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+# CI only reads the repository: it builds, tests, and compiles documentation
+# without writing anything back. Stating that here keeps the `GITHUB_TOKEN` from
+# inheriting whatever the repository default happens to be.
+permissions:
+  contents: read
+
 jobs:
   test:
     name: Build and test
