@@ -1,0 +1,19 @@
+.github/workflows/ci.yml
+  s_287548d5a32f4a::t_3d6ef945591ff2 13-18
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "7b8da4702afda71e3987d3e88138e1c611fd3f40",
+  "prompts": {},
+  "sessions": {
+    "s_287548d5a32f4a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "2e8ba568-ee40-48cd-8fab-3b67850cf39c",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Sebastian Messingfeld <sebastian@messeb.com>"
+    }
+  }
+}
