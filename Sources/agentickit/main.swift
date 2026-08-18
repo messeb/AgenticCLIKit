@@ -74,7 +74,7 @@ struct AgenticKitCommand {
       --attach <path-or-url>   repeatable; remote URLs are downloaded first
 
     CLIs
-      claude-code, codex, copilot, antigravity, vibe
+      claude-code, codex, copilot, antigravity, vibe, grok
 
     POLICIES
       planOnly (default), readOnly, acceptingEdits, unsafeBypassAll

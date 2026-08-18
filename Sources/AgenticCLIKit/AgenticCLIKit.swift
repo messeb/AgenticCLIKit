@@ -25,7 +25,7 @@ public struct AgenticCLIKit: Sendable {
     private let cache = HealthReportCache()
 
     /// - Parameters:
-    ///   - agents: adapters to register. Defaults to all four shipped adapters.
+    ///   - agents: adapters to register. Defaults to every shipped adapter.
     ///   - sessionStore: where ``SessionReference`` values are recorded.
     ///     In-memory by default, so nothing is written to disk unless asked.
     public init(
@@ -47,6 +47,7 @@ public struct AgenticCLIKit: Sendable {
             Copilot.Adapter(locator: locator),
             Antigravity.Adapter(locator: locator),
             Vibe.Adapter(locator: locator),
+            Grok.Adapter(locator: locator),
         ]
     }
 
@@ -73,7 +74,7 @@ public struct AgenticCLIKit: Sendable {
 
     /// Probes every registered CLI concurrently.
     ///
-    /// Concurrency is the point: four sequential login-shell lookups plus four
+    /// Concurrency is the point: sequential login-shell lookups plus auth
     /// auth probes would take seconds on a cold start.
     ///
     /// Cold-probe cost is dominated by whichever CLI checks credentials over the

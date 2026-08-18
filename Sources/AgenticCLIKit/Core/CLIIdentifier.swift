@@ -32,6 +32,8 @@ public struct CLIIdentifier: RawRepresentable, Hashable, Sendable, Codable {
     public static let copilot = CLIIdentifier("copilot")
     /// Google's Antigravity CLI (`agy`).
     public static let antigravity = CLIIdentifier("antigravity")
+    /// xAI's Grok Build CLI (`grok`).
+    public static let grok = CLIIdentifier("grok")
 }
 
 extension CLIIdentifier: CustomStringConvertible {

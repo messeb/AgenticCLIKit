@@ -23,11 +23,11 @@ configuration.use(ClaudeCode.Model.opus)
 
 ## Trust the origin, not just the identifier
 
-Only one of the five CLIs can genuinely enumerate its models, so every entry carries an ``AgentModel/Origin`` saying where it came from.
+Two of the six CLIs can genuinely enumerate their models, so every entry carries an ``AgentModel/Origin`` saying where it came from.
 
 | `origin` | Meaning | Source |
 |---|---|---|
-| ``AgentModel/Origin/catalog`` | Authoritative and complete | `agy models`, which asks the backend |
+| ``AgentModel/Origin/catalog`` | Authoritative and complete | `agy models` or `grok models` |
 | ``AgentModel/Origin/bundled`` | Maintained in this package | ``ClaudeCode/Model``, ``Codex/Model``, ``Vibe/Model`` |
 | ``AgentModel/Origin/configuration`` | The user's configured default | `~/.codex/config.toml`, `~/.vibe/config.toml` |
 | ``AgentModel/Origin/documentation`` | An alias the installed binary documents | the `--model` paragraph of `claude --help` |

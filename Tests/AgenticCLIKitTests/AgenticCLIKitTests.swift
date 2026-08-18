@@ -32,15 +32,16 @@ struct AgenticCLIKitFacadeTests {
         RunConfiguration(workingDirectory: workingDirectory, permissions: .readOnly)
     }
 
-    @Test("Registers the five shipped adapters by default")
+    @Test("Registers the six shipped adapters by default")
     func registersDefaultAgents() {
         let kit = AgenticCLIKit()
-        #expect(kit.agents.count == 5)
+        #expect(kit.agents.count == 6)
         #expect(kit[.claudeCode] != nil)
         #expect(kit[.codex] != nil)
         #expect(kit[.copilot] != nil)
         #expect(kit[.antigravity] != nil)
         #expect(kit[.vibe] != nil)
+        #expect(kit[.grok] != nil)
         #expect(kit["nonexistent"] == nil)
     }
 
@@ -53,13 +54,13 @@ struct AgenticCLIKitFacadeTests {
         let kit = AgenticCLIKit(agents: AgenticCLIKit.defaultAgents() + [StubAgent()])
         let conversational = kit.agents(supporting: [.prompting, .sessions])
 
-        #expect(conversational.count == 5)
+        #expect(conversational.count == 6)
         #expect(!conversational.contains { $0.identifier == .stub })
 
         // Codex and Antigravity sandbox by filesystem scope rather than by tool
         // name, so they are not offered for a tool allowlist.
         let allowlisting = kit.agents(supporting: .toolAllowlist).map(\.identifier)
-        #expect(allowlisting == [.claudeCode, .copilot, .vibe])
+        #expect(allowlisting == [.claudeCode, .copilot, .vibe, .grok])
     }
 
     @Test("Health report covers every agent, in registration order")

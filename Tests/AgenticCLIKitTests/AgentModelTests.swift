@@ -258,6 +258,6 @@ struct AgentModelTests {
         let supported = Set(
             AgenticCLIKit().agents(supporting: .modelDiscovery).map(\.identifier)
         )
-        #expect(supported == Set([CLIIdentifier.claudeCode, .codex, .copilot, .antigravity, .vibe]))
+        #expect(supported == Set([CLIIdentifier.claudeCode, .codex, .copilot, .antigravity, .vibe, .grok]))
     }
 }
