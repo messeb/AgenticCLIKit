@@ -259,14 +259,14 @@ struct StructuredRunTests {
         }
     }
 
-    /// Copilot is the exception among the shipped adapters: it prompts and
+    /// Copilot and Vibe are the exceptions among the shipped adapters: they prompt and
     /// streams JSON, but has no flag that constrains the reply to a schema, so
     /// it is excluded rather than served by a best-effort prompt instruction.
     @Test("Only adapters that can enforce a schema are offered for typed runs")
     func promptingAdaptersSupportSchemas() {
         let kit = AgenticCLIKit()
         let supported: Set<CLIIdentifier> = Set(kit.structuredOutputAgents.map(\.identifier))
-        #expect(supported == Set([CLIIdentifier.claudeCode, .codex, .antigravity]))
+        #expect(supported == Set([CLIIdentifier.claudeCode, .codex, .antigravity, .grok]))
         #expect(!supported.contains(.copilot))
     }
 

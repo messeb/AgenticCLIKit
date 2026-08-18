@@ -50,7 +50,7 @@ struct DiscoveryIntegrationTests {
         #expect(elapsed < .seconds(2))
     }
 
-    @Test("All five CLIs probe concurrently, bounded by the slowest one")
+    @Test("All six CLIs probe concurrently, bounded by the slowest one")
     func probesAllCLIsConcurrently() async throws {
         let kit = AgenticCLIKit()
         let clock = ContinuousClock()
@@ -59,8 +59,8 @@ struct DiscoveryIntegrationTests {
         let elapsed = clock.now - started
 
         print(report.formattedSummary())
-        print("all five probed in \(elapsed.seconds)s")
-        #expect(report.entries.count == 5)
+        print("all six probed in \(elapsed.seconds)s")
+        #expect(report.entries.count == 6)
         // Comfortably below the ~3s a serial pass over the same probes takes.
         #expect(elapsed < .seconds(5))
 

@@ -4,7 +4,7 @@ Ask for a Swift record and get one, enforced by the provider.
 
 ## Overview
 
-All three prompting CLIs accept a JSON Schema and constrain the model's final message to match it. Decoding on the Swift side is therefore checking a contract that was already enforced, not hoping the model remembered to reply in JSON.
+Four prompting CLIs accept a JSON Schema and constrain the model's final message to match it. Decoding on the Swift side is therefore checking a contract that was already enforced, not hoping the model remembered to reply in JSON.
 
 ```swift
 struct CommitMessage: StructuredOutput {

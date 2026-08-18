@@ -1,6 +1,6 @@
 # ``AgenticCLIKit``
 
-Drive locally installed AI agent CLIs — Claude Code, Codex, GitHub Copilot, Antigravity, and Mistral Vibe — from a macOS app.
+Drive locally installed AI agent CLIs — Claude Code, Codex, GitHub Copilot, Antigravity, Mistral Vibe, and xAI Grok Build — from a macOS app.
 
 ## Overview
 

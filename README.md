@@ -16,13 +16,14 @@
   <a href="https://github.com/github/copilot-cli"><img src="https://img.shields.io/badge/GitHub_Copilot-1.0.80-24292E?logo=githubcopilot&logoColor=white" alt="GitHub Copilot 1.0.80"></a>
   <a href="https://antigravity.google"><img src="https://img.shields.io/badge/Antigravity-1.1.13-4285F4?logo=googlegemini&logoColor=white" alt="Antigravity 1.1.13"></a>
   <a href="https://github.com/mistralai/mistral-vibe"><img src="https://img.shields.io/badge/Mistral_Vibe-2.24.1-FA520F?logo=mistralai&logoColor=white" alt="Mistral Vibe 2.24.1"></a>
+  <a href="https://x.ai/cli"><img src="https://img.shields.io/badge/Grok_Build-1.0.5-111111?logo=x&logoColor=white" alt="Grok Build 1.0.5"></a>
 </p>
 
 <p align="center"><sub>Supported CLIs — each badge shows the release its adapter is verified against.</sub></p>
 
-A Swift library for driving locally installed agentic CLIs — Claude Code, Codex, GitHub Copilot, Antigravity, and Mistral Vibe — from your own macOS app.
+A Swift library for driving locally installed agentic CLIs — Claude Code, Codex, GitHub Copilot, Antigravity, Mistral Vibe, and xAI Grok Build — from your own macOS app.
 
-The CLIs bring their own auth, billing, sandboxing, and session persistence. This package brings the typed Swift layer: discovery, readiness, one-shot and multi-turn runs, streaming, session recovery, and typed errors — instead of five hand-rolled `Process` integrations that break on every CLI release.
+The CLIs bring their own auth, billing, sandboxing, and session persistence. This package brings the typed Swift layer: discovery, readiness, one-shot and multi-turn runs, streaming, session recovery, and typed errors — instead of six hand-rolled `Process` integrations that break on every CLI release.
 
 ```swift
 let kit = AgenticCLIKit()
@@ -142,7 +143,7 @@ On `vibe`, `--enabled-tools` is enforcement rather than a request — in program
 
 ## Typed results, not prose
 
-Ask for a Swift record and get one. Three of the five CLIs — `claude`, `codex`, and `agy` — accept a JSON Schema and constrain the model's final message to match it, so the decode is checking a contract the provider already enforced — not hoping the model remembered to reply in JSON.
+Ask for a Swift record and get one. Four of the six CLIs — `claude`, `codex`, `agy`, and `grok` — accept a JSON Schema and constrain the model's final message to match it, so the decode is checking a contract the provider already enforced — not hoping the model remembered to reply in JSON.
 
 ```swift
 struct CommitMessage: StructuredOutput {
@@ -233,7 +234,7 @@ models.defaultModel            // preselect this
 configuration.use(ClaudeCode.Model.opus)   // or: configuration.model = "claude-opus-5"
 ```
 
-Only one of the five CLIs can genuinely enumerate its models, so `AgentModel.origin` says how much to trust each entry:
+Two of the six CLIs genuinely enumerate their models, so `AgentModel.origin` says how much to trust each entry:
 
 | `origin` | Meaning | Where it comes from |
 |---|---|---|
