@@ -85,29 +85,29 @@ The package also never installs, updates, or logs into anything. It reports what
 
 Capabilities are declared, not assumed. Ask for something an adapter cannot do faithfully and you get a typed error — never a silent substitution.
 
-| | Claude Code | Codex | Copilot | Antigravity | Vibe |
-|---|---|---|---|---|---|
-| Executable | `claude` | `codex` | `copilot` | `agy` | `vibe` |
-| Verified against | 2.1.224 | 0.147.0 | 1.0.80 | 1.1.13 | 2.24.1 |
-| Prompting | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Sessions / resume | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Resume across directories | ✅ | ✅ | ✅ | ❌ | ✅ |
-| Token deltas while streaming | ✅ | ❌ (whole messages) | ✅ | ✅ | ❌ (whole messages) |
-| Structured output | ✅ JSON / stream-json | ✅ JSONL | ✅ JSONL | ✅ JSON / stream-json | ✅ NDJSON |
-| Usage reporting | tokens + **USD cost** | tokens | premium requests + AI credits | tokens | tokens + **USD cost** (from its session log) |
-| Per-tool allowlist | ✅ | ❌ | ✅ **patterns** | ❌ | ✅ **patterns** |
-| Schema-enforced output | ✅ `--json-schema` | ✅ `--output-schema` | ❌ | ✅ `--json-schema` | ❌ |
-| File attachments | ✅ by path | ✅ by path | ✅ `--attachment` | ✅ by path | ✅ by path |
-| Native image attachments | ❌ (reads from disk) | ✅ `--image` | ✅ `--attachment` | ❌ (reads from disk) | ❌ (reads from disk) |
-| Ephemeral (no session) runs | ✅ | ✅ | ❌ | ❌ | ❌ |
-| Turn limits | ❌ (no `--max-turns` in 2.x) | ❌ | ❌ | ❌ | ✅ `--max-turns` |
-| Model discovery | maintained list + `--help` aliases | maintained list + `config.toml` | maintained list + `settings.json` | ✅ live catalogue (`agy models`) | maintained list + `config.toml` |
-| Auth probe | `claude auth status` (JSON) | `codex login status` | `~/.copilot/config.json` | `agy models` | `MISTRAL_API_KEY` / `~/.vibe/.env` |
-| Status | stable | stable | stable | **experimental** | **experimental** |
+| | Claude Code | Codex | Copilot | Antigravity | Vibe | Grok Build |
+|---|---|---|---|---|---|---|
+| Executable | `claude` | `codex` | `copilot` | `agy` | `vibe` | `grok` |
+| Verified against | 2.1.224 | 0.147.0 | 1.0.80 | 1.1.13 | 2.24.1 | 1.0.5 |
+| Prompting | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Sessions / resume | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Resume across directories | ✅ | ✅ | ✅ | ❌ | ✅ | ✅ |
+| Token deltas while streaming | ✅ | ❌ (whole messages) | ✅ | ✅ | ❌ (whole messages) | ✅ |
+| Structured output | ✅ JSON / stream-json | ✅ JSONL | ✅ JSONL | ✅ JSON / stream-json | ✅ NDJSON | ✅ JSON / streaming JSON |
+| Usage reporting | tokens + **USD cost** | tokens | premium requests + AI credits | tokens | tokens + **USD cost** (from its session log) | tokens |
+| Per-tool allowlist | ✅ | ❌ | ✅ **patterns** | ❌ | ✅ **patterns** | ✅ rules |
+| Schema-enforced output | ✅ `--json-schema` | ✅ `--output-schema` | ❌ | ✅ `--json-schema` | ❌ | ✅ `--json-schema` |
+| File attachments | ✅ by path | ✅ by path | ✅ `--attachment` | ✅ by path | ✅ by path | ❌ |
+| Native image attachments | ❌ (reads from disk) | ✅ `--image` | ✅ `--attachment` | ❌ (reads from disk) | ❌ (reads from disk) | ❌ (reads from disk) |
+| Ephemeral (no session) runs | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ |
+| Turn limits | ❌ (no `--max-turns` in 2.x) | ❌ | ❌ | ❌ | ✅ `--max-turns` | ✅ `--max-turns` |
+| Model discovery | maintained list + `--help` aliases | maintained list + `config.toml` | maintained list + `settings.json` | ✅ live catalogue (`agy models`) | maintained list + `config.toml` | ✅ live catalogue (`grok models`) |
+| Auth probe | `claude auth status` (JSON) | `codex login status` | `~/.copilot/config.json` | `agy models` | `MISTRAL_API_KEY` / `~/.vibe/.env` | `grok models` |
+| Status | stable | stable | stable | **experimental** | **experimental** | **experimental** |
 
 Note that GitHub's agent is `copilot`, not `gh`. `gh` manages repositories — issues, PRs, releases — and takes no prompts at all, so it is not an agentic CLI and is not part of this package.
 
-No adapter supports everything, and the gaps are not the same shape. Copilot streams and holds sessions but cannot constrain a reply to a schema; Antigravity has a live model catalogue but no per-tool allowlist; Vibe is the only one that can cap a run by turns, and the only one whose usage has to be read from a file. Ask for something an adapter cannot do faithfully and you get `.unsupportedCapability` — never a silent substitution.
+No adapter supports everything, and the gaps are not the same shape. Copilot streams and holds sessions but cannot constrain a reply to a schema; Antigravity has a live model catalogue but no per-tool allowlist; Grok and Vibe can cap a run by turns, while Vibe is the only one whose usage has to be read from a file. Ask for something an adapter cannot do faithfully and you get `.unsupportedCapability` — never a silent substitution.
 
 ---
 
@@ -125,7 +125,7 @@ public enum PermissionPolicy {
 }
 ```
 
-`planOnly`, `readOnly`, and `acceptingEdits` work on every prompting adapter. `allowingTools` requires `.toolAllowlist` — Claude Code, Copilot, and Vibe have it; Codex and Antigravity sandbox by filesystem scope rather than by tool name, so they **refuse** it instead of quietly widening it to something broader. `unsafeBypassAll` logs at `.fault`.
+`planOnly`, `readOnly`, and `acceptingEdits` work on every prompting adapter. `allowingTools` requires `.toolAllowlist` — Claude Code, Copilot, Vibe, and Grok have it; Codex and Antigravity sandbox by filesystem scope rather than by tool name, so they **refuse** it instead of quietly widening it to something broader. `unsafeBypassAll` logs at `.fault`.
 
 How the policies land, per CLI:
 
