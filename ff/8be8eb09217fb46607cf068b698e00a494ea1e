@@ -1,0 +1,48 @@
+Sources/AgenticCLIKit/AgenticCLIKit.swift
+  s_f5b0a34ff7124d::t_9a4543830563cd 28,50,77
+Sources/AgenticCLIKit/Adapters/Grok/GrokAdapter.swift
+  s_f5b0a34ff7124d::t_9a4543830563cd 1-100,103-129
+  s_f5b0a34ff7124d::t_9c1a8eaa1cb2f8 101-102
+Tests/AgenticCLIKitTests/GrokAdapterTests.swift
+  s_f5b0a34ff7124d::t_74043f478a8548 1-76
+Sources/AgenticCLIKit/AgenticCLIKit.docc/Articles/Models.md
+  s_f5b0a34ff7124d::t_3c7af10aa94d49 30
+  s_f5b0a34ff7124d::t_efef15d6581251 26
+Tests/AgenticCLIKitTests/IntegrationTests.swift
+  s_f5b0a34ff7124d::t_3c7af10aa94d49 53,62-63
+Sources/AgenticCLIKit/Adapters/Grok/Grok.swift
+  s_f5b0a34ff7124d::t_9a4543830563cd 1-21,23-82,96-126,128-132
+  s_f5b0a34ff7124d::t_9c1a8eaa1cb2f8 22,83-95,127
+Sources/AgenticCLIKit/AgenticCLIKit.docc/AgenticCLIKit.md
+  s_f5b0a34ff7124d::t_efef15d6581251 3
+Sources/agentickit/main.swift
+  s_f5b0a34ff7124d::t_9a4543830563cd 77
+Tests/AgenticCLIKitTests/AgentModelTests.swift
+  s_f5b0a34ff7124d::t_a0f8e74a9e5821 261
+Sources/AgenticCLIKit/Core/CLIIdentifier.swift
+  s_f5b0a34ff7124d::t_9a4543830563cd 35-36
+Tests/AgenticCLIKitTests/AgenticCLIKitTests.swift
+  s_f5b0a34ff7124d::t_74043f478a8548 35,38,44,57,63
+README.md
+  s_f5b0a34ff7124d::t_efef15d6581251 19,24,26,146,237
+Tests/AgenticCLIKitTests/StructuredOutputTests.swift
+  s_f5b0a34ff7124d::t_a0f8e74a9e5821 262,269
+Sources/AgenticCLIKit/AgenticCLIKit.docc/Articles/TypedResults.md
+  s_f5b0a34ff7124d::t_3c7af10aa94d49 7
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "ff8be8eb09217fb46607cf068b698e00a494ea1e",
+  "prompts": {},
+  "sessions": {
+    "s_f5b0a34ff7124d": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0160a-ea3c-7f40-91aa-bf4295683865",
+        "model": "gpt-5.6-terra"
+      },
+      "human_author": "Sebastian Messingfeld <sebastian@messeb.com>"
+    }
+  }
+}
