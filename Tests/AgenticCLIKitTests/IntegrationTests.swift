@@ -560,3 +560,82 @@ struct StructuredAndAttachmentIntegrationTests {
     5FDvcfRYWgAAAAAElFTkSuQmCC
     """)!
 }
+
+@Suite(
+    "Integration: tool calling",
+    .enabled(if: IntegrationGate.liveRunsEnabled, "Set AGENTICCLIKIT_LIVE=1 — this spends tokens"),
+    .timeLimit(.minutes(20)),
+    .serialized
+)
+struct ToolCallingIntegrationTests {
+    /// A tool whose answer cannot be guessed, reasoned out, or read off the
+    /// disk. That is the whole point: if the reported temperature matches, the
+    /// call really happened.
+    struct SecretWeatherTool: AgentTool {
+        let name = "getWeather"
+        let description = "Retrieve the latest weather information for a city"
+
+        struct Arguments: Decodable, Sendable {
+            let city: String
+        }
+
+        struct Forecast: Encodable, Sendable {
+            let city: String
+            let temperature: Int
+        }
+
+        let argumentSchema = JSONSchema.object([
+            "city": .string("The city to get weather information for"),
+        ])
+
+        static let temperatures = ["Boston": 71, "Wichita": 94, "Pittsburgh": 63]
+
+        func call(arguments: Arguments) async throws -> Forecast {
+            Forecast(city: arguments.city, temperature: Self.temperatures[arguments.city] ?? 0)
+        }
+    }
+
+    /// Every CLI, against the scenario from the feature request.
+    ///
+    /// `vibe` is asked with ``PermissionPolicy/acceptingEdits`` rather than
+    /// read-only on purpose: its read-only mapping selects the `plan` agent
+    /// profile, which writes a plan instead of answering in any format it is
+    /// given. That is a real limit of that combination, documented in the README
+    /// rather than papered over here.
+    @Test(
+        "Each CLI calls the host's tool and answers from the results",
+        arguments: [
+            (CLIIdentifier.claudeCode, PermissionPolicy.readOnly),
+            (.codex, .readOnly),
+            (.copilot, .readOnly),
+            (.antigravity, .readOnly),
+            (.grok, .readOnly),
+            (.vibe, .acceptingEdits),
+        ]
+    )
+    func callsHostTools(cli: CLIIdentifier, permissions: PermissionPolicy) async throws {
+        let kit = AgenticCLIKit()
+        try await kit.agent(for: cli).verifyReady()
+
+        let session = AgentSession(
+            kit: kit,
+            cli: cli,
+            workingDirectory: FileManager.default.temporaryDirectory,
+            tools: [SecretWeatherTool()],
+            instructions: "Help the person with getting weather information",
+            configuration: RunConfiguration(
+                workingDirectory: FileManager.default.temporaryDirectory,
+                permissions: permissions,
+                timeout: .seconds(240)
+            )
+        )
+
+        let response = try await session.respond(to: "Is it hotter in Boston, Wichita, or Pittsburgh?")
+
+        // Three cities, so three calls — and the answer has to name the hottest.
+        #expect(Set(response.toolCalls.map(\.tool)) == ["getWeather"])
+        #expect(response.toolCalls.count >= 3)
+        #expect(response.text.contains("Wichita"))
+        print("\(cli): \(response.rounds) rounds, \(response.toolCalls.count) calls — \(response.text)")
+    }
+}

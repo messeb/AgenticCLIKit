@@ -97,6 +97,7 @@ Capabilities are declared, not assumed. Ask for something an adapter cannot do f
 | Usage reporting | tokens + **USD cost** | tokens | premium requests + AI credits | tokens | tokens + **USD cost** (from its session log) | tokens |
 | Per-tool allowlist | ✅ | ❌ | ✅ **patterns** | ❌ | ✅ **patterns** | ✅ rules |
 | Schema-enforced output | ✅ `--json-schema` | ✅ `--output-schema` | ❌ | ✅ `--json-schema` | ❌ | ✅ `--json-schema` |
+| Tool calling (`AgentTool`) | ✅ schema-enforced | ✅ schema-enforced | ✅ prompted | ✅ schema-enforced | ✅ prompted | ✅ schema-enforced |
 | File attachments | ✅ by path | ✅ by path | ✅ `--attachment` | ✅ by path | ✅ by path | ❌ |
 | Native image attachments | ❌ (reads from disk) | ✅ `--image` | ✅ `--attachment` | ❌ (reads from disk) | ❌ (reads from disk) | ❌ (reads from disk) |
 | Ephemeral (no session) runs | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ |
@@ -182,6 +183,70 @@ Three per-CLI details, all found by running them:
 - **`claude`** reports the validated object in a dedicated `structured_output` field as well as in `result`.
 - **`codex`** takes the schema as a *file path*, so schema runs get a scratch directory that is deleted when the run ends.
 - **`agy`** populates `structured_output` only in its buffered `json` mode, and returns an **empty response** if you combine a schema with plan mode. The adapter therefore switches to `json` for schema runs and refuses `.planOnly` with an explanation — use `.readOnly`.
+
+---
+
+## Tool calling: let the agent call back into your app
+
+Write a tool the way Foundation Models has you write one, and the agent can call it mid-conversation — on all six CLIs.
+
+```swift
+struct WeatherTool: AgentTool {
+    let name = "getWeather"
+    let description = "Retrieve the latest weather information for a city"
+
+    struct Arguments: Decodable, Sendable {
+        let city: String
+    }
+
+    struct Forecast: Encodable, Sendable {
+        let city: String
+        let temperature: Int
+    }
+
+    let argumentSchema = JSONSchema.object([
+        "city": .string("The city to get weather information for"),
+    ])
+
+    func call(arguments: Arguments) async throws -> Forecast {
+        Forecast(city: arguments.city, temperature: try await Weather.temperature(in: arguments.city))
+    }
+}
+
+let session = AgentSession(
+    cli: .claudeCode,
+    workingDirectory: repositoryURL,
+    tools: [WeatherTool()],
+    instructions: "Help the person with getting weather information"
+)
+
+let response = try await session.respond(to: "Is it hotter in Boston, Wichita, or Pittsburgh?")
+
+response.text                       // "Wichita is hottest at 94°F, then Boston at 71°F…"
+response.toolCalls.map(\.tool)      // ["getWeather", "getWeather", "getWeather"]
+response.rounds                     // 4 — three calls plus the answer
+response.usage?.costUSD             // summed across every round
+```
+
+`Arguments` is decoded from what the model produced; `Output` is JSON-encoded back to it, unless it is already a `String`. A tool that takes nothing declares `NoArguments` and needs no schema. `AgentFunction` is the same thing with the types erased, for arguments better handled as raw JSON.
+
+**No MCP, no socket, no entitlement.** Every one of these CLIs can host tools over the Model Context Protocol, and every route into it costs something a library should not spend: a listening socket (which the App Sandbox blocks without `com.apple.security.network.server`), or an edit to the user's own CLI configuration. So tool calling here is built out of the two things all six already do well — a structured reply and a resumable session. Each turn the agent answers with one JSON object:
+
+```json
+{"action": "call", "tool": "getWeather", "arguments": "{\"city\": \"Boston\"}", "text": ""}
+```
+
+The kit runs the tool, resumes the session with the result, and repeats until the agent answers with `{"action": "final", …}`. `maximumToolRounds` (8 by default) bounds it, so a model that loops cannot bill forever; exceeding it throws `.toolCallLimitReached`.
+
+Three details of the wire format, each one a concession to a provider that rejects the alternative:
+
+- **`arguments` is a JSON string, not a nested object.** OpenAI's strict schemas require `additionalProperties: false` on every object they see, which a free-form argument bag cannot honour — `codex` rejects the whole run with `invalid_json_schema`. It is also how OpenAI's own function calling passes arguments, so models are fluent in it.
+- **Nothing is optional.** The same strict mode requires every property to appear in `required`. Unused fields carry `""`; nullable unions are not portable across the six providers, and an empty string is.
+- **The parser is looser than the schema.** `claude`, `codex`, `agy` and `grok` are handed the schema and the provider enforces it. `copilot` and `vibe` cannot enforce one, so they are asked in the prompt and parsed leniently — code fences, surrounding prose and a nested `arguments` object are all accepted.
+
+A tool that throws is not a failed run: the message goes back to the agent as an error result, so it can retry with different arguments or explain the problem. Naming a tool that does not exist is handled the same way. Both show up in `response.toolCalls` with `isError == true`.
+
+Verified end-to-end against all six CLIs (`Tests/…/IntegrationTests.swift`, `AGENTICCLIKIT_LIVE=1`) — and `agentickit tools <cli>` runs the example above against your own installs.
 
 ---
 
@@ -387,6 +452,7 @@ swift run agentickit run claude-code "What does this package do?" --permissions 
 swift run agentickit continue codex "Keep going"
 swift run agentickit models
 swift run agentickit commit-message claude-code
+swift run agentickit tools grok "Is it hotter in Boston, Wichita, or Pittsburgh?"
 swift run agentickit run claude-code "Summarise it" --attach report.pdf --attach https://example.com/spec.pdf
 swift run agentickit sessions
 ```
@@ -423,6 +489,8 @@ Conform to `ProcessBackedCLI` and you inherit discovery, environment constructio
 - **Vibe is experimental too.** It ships roughly weekly, and its programmatic surface is still moving.
 - **Vibe's usage comes from a file, not stdout.** Tokens and cost are read from `$VIBE_HOME/logs/session/…/meta.json` after the process exits, because `vibe` prints neither. A user who disables session logging in `config.toml` gets runs with `usage == nil` — the run itself is unaffected.
 - **Vibe's `--max-turns` counts the whole session.** The adapter reads the session's step count and offsets the limit so `maximumTurns` means the same thing as everywhere else; without a session log to read, it degrades to a stricter limit rather than refusing the run.
+- **Tool calling costs a CLI round trip per call.** The agent asks, the kit answers, the session resumes — so a three-tool answer is four invocations. That is the price of doing it without a listening socket; the alternative needs the network-server entitlement and, on three of the six CLIs, an edit to the user's own configuration.
+- **`vibe` will not follow the tool-calling format under `.planOnly` or `.readOnly`.** Both map onto its `plan` agent profile, which writes a plan and asks to be taken out of plan mode instead of answering. Use `.acceptingEdits` or `.allowingTools` when the session has tools; every other CLI is fine read-only.
 - **Health-report latency** is dominated by whichever CLI checks credentials over the network. The three local ones return in ~0.9s combined; `agy` costs ~2s on its own. Pass `maximumAge:` on repeat calls.
 
 ---

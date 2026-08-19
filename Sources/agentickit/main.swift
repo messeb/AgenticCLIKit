@@ -39,6 +39,7 @@ struct AgenticKitCommand {
             case "continue": try await continueSession(Array(arguments.dropFirst()))
             case "commit-message": try await commitMessage(Array(arguments.dropFirst()))
             case "models": try await models(Array(arguments.dropFirst()))
+            case "tools": try await tools(Array(arguments.dropFirst()))
             case "sessions": try await sessions()
             case "help", "--help", "-h": print(usage)
             default:
@@ -67,6 +68,7 @@ struct AgenticKitCommand {
       agentickit resume <cli> <session-id> <prompt> [options]
       agentickit continue <cli> <prompt> [options]
       agentickit commit-message <cli> [--dir <path>]
+      agentickit tools <cli> [<prompt>]
       agentickit models [<cli>]
       agentickit sessions
 
@@ -177,6 +179,61 @@ struct AgenticKitCommand {
         print()
         print(response.value.commitDescription)
         printFooter(response.response)
+    }
+
+    /// The worked example for tool calling: a tool the agent cannot answer
+    /// without, so a correct answer proves the call really happened.
+    struct WeatherTool: AgentTool {
+        let name = "getWeather"
+        let description = "Retrieve the latest weather information for a city"
+
+        struct Arguments: Decodable, Sendable {
+            let city: String
+        }
+
+        struct Forecast: Encodable, Sendable {
+            let city: String
+            let temperature: Int
+        }
+
+        let argumentSchema = JSONSchema.object([
+            "city": .string("The city to get weather information for"),
+        ])
+
+        /// Deterministic rather than random, so the demo's answer can be checked
+        /// against the numbers rather than merely looking plausible.
+        func call(arguments: Arguments) async throws -> Forecast {
+            Forecast(city: arguments.city, temperature: 60 + abs(arguments.city.hashValue % 40))
+        }
+    }
+
+    static func tools(_ arguments: [String]) async throws {
+        let options = try Options(arguments, positionalCount: 1)
+        let prompt = options.positional.count > 1
+            ? options.positional[1]
+            : "Is it hotter in Boston, Wichita, or Pittsburgh?"
+
+        let session = AgentSession(
+            kit: try makeKit(),
+            cli: CLIIdentifier(options.positional[0]),
+            workingDirectory: options.configuration.workingDirectory,
+            tools: [WeatherTool()],
+            instructions: "Help the person with getting weather information",
+            configuration: options.configuration
+        )
+
+        let response = try await session.respond(to: prompt)
+        print(response.text)
+
+        for call in response.toolCalls {
+            let arguments = String(decoding: call.arguments, as: UTF8.self)
+            print("  · \(call.tool)\(arguments) → \(call.output)")
+        }
+
+        var footer = ["\(response.rounds) rounds", "\(response.toolCalls.count) calls"]
+        if let total = response.usage?.totalTokens { footer.append("\(total) tokens") }
+        if let cost = response.usage?.costUSD { footer.append(String(format: "$%.4f", cost)) }
+        FileHandle.standardError.write(Data("\n— \(footer.joined(separator: " · "))\n".utf8))
     }
 
     /// Shows what each CLI reports, and where the answer came from.

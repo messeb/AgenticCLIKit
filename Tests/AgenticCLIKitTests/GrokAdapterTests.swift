@@ -73,4 +73,37 @@ struct GrokAdapterTests {
         #expect(response.session?.sessionID == "s-1")
         #expect(response.usage?.reasoningTokens == 3)
     }
+
+    /// `--json-schema` switches Grok to its buffered `json` format, which it
+    /// pretty-prints across many lines. Nothing there parses line by line, so a
+    /// schema run used to come back with no text, no session, and no way to
+    /// resume — which is exactly what a tool-calling exchange depends on.
+    @Test("Reads the buffered result Grok pretty-prints under a schema")
+    func translatesBufferedResult() async throws {
+        let recording = RecordedProcessRunner.Recording.output("""
+        {
+          "text": "{\\"action\\":\\"final\\",\\"tool\\":\\"\\",\\"arguments\\":\\"\\",\\"text\\":\\"done\\"}",
+          "stopReason": "end_turn",
+          "sessionId": "s-2",
+          "usage": {
+            "input_tokens": 11,
+            "output_tokens": 4
+          }
+        }
+        """)
+        let tested = Grok.Adapter(runner: RecordedProcessRunner(always: recording), locator: FakeExecutableLocator())
+
+        var config = configuration()
+        config.outputSchema = .object(["text": .string()])
+        let response = try await tested.run("hello", configuration: config)
+
+        #expect(response.session?.sessionID == "s-2")
+        #expect(response.stopReason == "end_turn")
+        #expect(response.usage?.inputTokens == 11)
+        #expect(response.structuredOutput != nil)
+        #expect(try ToolCallFormat.parse(
+            structuredOutput: response.structuredOutput,
+            text: response.text
+        ) == .final(text: "done"))
+    }
 }

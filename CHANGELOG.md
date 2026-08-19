@@ -6,7 +6,38 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ## [Unreleased]
 
+### Added
+
+- Tool calling. `AgentTool` describes a function in the host app — a name, a
+  description, a typed `Arguments`, and a `call` returning anything `Encodable` —
+  and `AgentSession` lets the agent invoke it mid-conversation. The shape mirrors
+  Foundation Models' `Tool`, with the argument schema written as a `JSONSchema`
+  rather than derived by a macro, since this package ships neither macros nor
+  dependencies. `AgentFunction` is the type-erased form for arguments better
+  handled as raw JSON.
+- `ToolCallFormat`: the reply format the exchange runs on. Rather than hosting an
+  MCP server — which needs a listening socket, the `com.apple.security.network.server`
+  entitlement, and on three of the six CLIs an edit to the user's own
+  configuration — the agent answers each turn with one JSON object, the kit runs
+  the tool and resumes the session with the result. Verified end-to-end against
+  all six CLIs. Two details were measured rather than assumed: `arguments`
+  travels as a JSON string and no field is optional, because OpenAI's strict
+  schemas (which `codex` enforces) reject a free-form nested object and any
+  property missing from `required`.
+- `ScriptedAgent` in `AgenticCLIKitTesting`: a test double that answers a
+  different reply per invocation and records the prompts it was given, for
+  multi-turn exchanges that `StubAgent`'s single fixed event list cannot express.
+- `agentickit tools <cli> [prompt]` runs the worked example against a real CLI.
+
+
 ## [1.3.0] - 2026-08-18
+
+### Fixed
+
+- Grok's buffered `json` output — which `--json-schema` switches it into — is
+  pretty-printed across several lines, so nothing parsed line by line and a
+  schema run returned no text, no usage, and no session to resume. The translator
+  now reads the whole of stdout when no line yielded a result.
 
 ## [1.2.1] - 2026-08-16
 

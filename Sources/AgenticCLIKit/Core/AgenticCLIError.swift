@@ -48,6 +48,13 @@ public enum AgenticCLIError: Error, Sendable {
     case structuredOutputFailed(reason: String, text: String)
     /// An attachment could not be read or fetched.
     case attachmentUnavailable(URL, reason: String)
+    /// An ``AgentTool`` cannot be offered to a model as declared.
+    case invalidTool(name: String, reason: String)
+    /// The agent's reply did not follow ``ToolCallFormat``, twice.
+    case toolCallProtocolViolation(reason: String, text: String)
+    /// The agent kept calling tools past ``AgentSession/maximumToolRounds``
+    /// without answering.
+    case toolCallLimitReached(CLIIdentifier, rounds: Int, calls: [String])
     /// An attachment exceeded ``RunConfiguration/maximumAttachmentBytes``.
     case attachmentTooLarge(URL, byteCount: Int, limit: Int)
     /// Output could not be parsed into the expected shape — usually a sign the
@@ -99,6 +106,13 @@ extension AgenticCLIError: LocalizedError {
             return "\(cli) produced more than \(bytes) bytes of output."
         case let .structuredOutputFailed(reason, _):
             return "Structured output failed: \(reason)"
+        case let .invalidTool(name, reason):
+            return "The tool '\(name)' cannot be offered: \(reason)"
+        case let .toolCallProtocolViolation(reason, _):
+            return "The agent did not reply in the tool-calling format: \(reason)"
+        case let .toolCallLimitReached(cli, rounds, calls):
+            let ran = calls.isEmpty ? "no tools" : calls.joined(separator: ", ")
+            return "\(cli) ran \(rounds) tool rounds (\(ran)) without answering."
         case let .attachmentUnavailable(url, reason):
             return "Could not attach \(url.lastPathComponent): \(reason)"
         case let .attachmentTooLarge(url, byteCount, limit):
@@ -122,6 +136,7 @@ extension AgenticCLIError: LocalizedError {
         case let .notAuthenticated(_, command): return "Run `\(command)` in a terminal."
         case let .unsupportedVersion(cli, _, minimum): return "Update \(cli) to \(minimum) or newer."
         case .turnLimitReached: return "Raise RunConfiguration.maximumTurns or resume the session."
+        case .toolCallLimitReached: return "Raise AgentSession.maximumToolRounds, or narrow the task."
         case .timedOut: return "Raise RunConfiguration.timeout."
         case .attachmentTooLarge: return "Raise RunConfiguration.maximumAttachmentBytes or send a smaller file."
         case let .unsupportedModel(cli, _, _):
@@ -140,13 +155,15 @@ extension AgenticCLIError: LocalizedError {
              let .unsupportedModel(cli, _, _),
              let .timedOut(cli, _), let .cancelled(cli),
              let .turnLimitReached(cli, _), let .outputLimitExceeded(cli, _),
-             let .processFailed(cli, _, _), let .launchFailed(cli, _):
+             let .processFailed(cli, _, _), let .launchFailed(cli, _),
+             let .toolCallLimitReached(cli, _, _):
             return cli
         case let .sessionNotFound(session), let .sessionExpired(session),
              let .workingDirectoryMismatch(session, _):
             return session.cli
         case .malformedOutput, .invalidWorkingDirectory, .structuredOutputFailed,
-             .attachmentUnavailable, .attachmentTooLarge:
+             .attachmentUnavailable, .attachmentTooLarge,
+             .invalidTool, .toolCallProtocolViolation:
             return nil
         }
     }
