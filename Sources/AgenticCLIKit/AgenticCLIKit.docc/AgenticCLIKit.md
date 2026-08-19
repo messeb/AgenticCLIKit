@@ -52,6 +52,16 @@ let response = try await kit.run(
 - ``JSONSchema``
 - ``StructuredResponse``
 
+### Letting an agent call your code
+
+- <doc:ToolCalling>
+- ``AgentTool``
+- ``AgentSession``
+- ``AgentFunction``
+- ``ToolCallFormat``
+- ``AgentSessionResponse``
+- ``ToolCall``
+
 ### Giving an agent files
 
 - <doc:Attachments>
