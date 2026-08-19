@@ -224,7 +224,7 @@ struct AgentToolTests {
         }
 
         let function = Ping().erased
-        #expect(try (function.parameters.jsonObject()["properties"] as? [String: Any])?.isEmpty == true)
+        #expect((function.parameters.jsonObject()["properties"] as? [String: Any])?.isEmpty == true)
         #expect(try await function.handler(Data("{}".utf8)) == "pong")
     }
 
