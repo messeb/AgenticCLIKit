@@ -6,7 +6,7 @@ extension ClaudeCode {
     /// Sessions are cross-directory: a conversation started in one repository
     /// can be resumed from anywhere with `--resume <id>`.
     ///
-    /// Verified against `claude` 2.1.224. Note that this build has no
+    /// Verified against `claude` 2.1.296. Note that this build has no
     /// `--max-turns` flag, so ``CLICapabilities/turnLimits`` is absent and
     /// ``RunConfiguration/maximumTurns`` is rejected rather than ignored.
     public struct Adapter: ProcessBackedCLI {

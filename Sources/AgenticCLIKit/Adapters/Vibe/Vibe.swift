@@ -21,7 +21,7 @@ extension CLIIdentifier {
 /// - **The model is an environment variable**, not a flag, and an unknown one
 ///   is ignored rather than refused. See ``Vibe/Model``.
 ///
-/// Verified against `vibe` 2.24.1.
+/// Verified against `vibe` 2.26.1 and 2.24.1.
 public enum Vibe {
     /// The name `vibe` uses for its home directory environment variable.
     static let homeVariable = "VIBE_HOME"
@@ -112,10 +112,11 @@ extension Vibe {
     ///   ``AgentEvent/toolUseRequested(_:)`` and ``AgentEvent/toolResult(_:)``.
     ///   Assistant messages arrive whole for the same reason: there are no token
     ///   deltas to forward.
-    /// - **A resumed run replays the whole transcript first.** Everything before
-    ///   the `checkpoint` entry is history that already happened, and emitting it
-    ///   would make a caller see the previous answer as part of this turn. The
-    ///   checkpoint is the boundary, so history is suppressed until it arrives.
+    /// - **A resumed run may replay the whole transcript first.** Before 2.26,
+    ///   everything before the `checkpoint` entry is history that already
+    ///   happened, and emitting it would make a caller see the previous answer
+    ///   as part of this turn. The Unified Harness replays nothing, so history
+    ///   is suppressed until a checkpoint or the new turn's prompt arrives.
     struct Translator: AgentOutputTranslating {
         let workingDirectory: URL
         let resumedSession: SessionReference?
@@ -182,6 +183,13 @@ extension Vibe {
                 let message = entry["message"] as? String ?? "checkpoint"
                 events.append(.diagnostic(message))
                 return events
+            }
+            // The Unified Harness (2.26+) replays nothing and prints no
+            // checkpoint: its first line is already the new turn's prompt.
+            // Replayed prompts carry `source: "harness"`, so a `turn_start`
+            // message is a boundary under either harness.
+            if isReplayingHistory, type == "message", entry["source"] as? String == "turn_start" {
+                isReplayingHistory = false
             }
             guard !isReplayingHistory else { return events }
 

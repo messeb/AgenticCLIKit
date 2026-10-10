@@ -2,7 +2,7 @@ import Foundation
 
 /// Namespace for the OpenAI Codex (`codex`) adapter.
 ///
-/// Verified against `codex-cli` 0.147.0.
+/// Verified against `codex-cli` 0.162.1.
 public enum Codex {
     /// Sandbox policies `codex exec --sandbox` accepts.
     enum SandboxMode: String {

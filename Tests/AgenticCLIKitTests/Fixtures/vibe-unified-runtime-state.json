@@ -1,0 +1,25 @@
+{
+  "runtime_state_version": 3,
+  "session_id": "66f27779-7144-e4f2-ead6-1e84ca4582b2",
+  "session_metadata": {
+    "active_model": "glm-5-3",
+    "agent_name": null,
+    "cwd": "/tmp/vibe-fixture",
+    "hook_bindings": [
+      {
+        "id": "builtin:agents_md",
+        "order": 0,
+        "point": "post_tool_call",
+        "selector": {
+          "type": "always"
+        }
+      }
+    ],
+    "parent_session_id": null,
+    "reasoning_effort": "high",
+    "root_session_id": "66f27779-7144-e4f2-ead6-1e84ca4582b2",
+    "subagent_policy_ceiling_digest": null,
+    "subagent_spawn_key": null,
+    "subagent_template_digest": null
+  }
+}

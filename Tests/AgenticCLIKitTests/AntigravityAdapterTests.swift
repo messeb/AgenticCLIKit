@@ -46,6 +46,30 @@ struct AntigravityAdapterTests {
         #expect(arguments[timeoutIndex + 1] == "120s")
     }
 
+    /// `agy` 1.3 runs `--mode plan` through its `/plan` workflow, which reaches
+    /// for shell commands that print mode then denies, ending the turn empty.
+    /// Turning off slash-command expansion keeps the mode without the workflow.
+    @Test(
+        "Plan mode skips the /plan workflow from agy 1.3",
+        arguments: [
+            (PermissionPolicy.planOnly, SemanticVersion?(SemanticVersion(1, 3, 2)), true),
+            (.readOnly, SemanticVersion(1, 3, 0), true),
+            (.planOnly, SemanticVersion(1, 1, 13), false),
+            (.readOnly, nil, false),
+            (.acceptingEdits, SemanticVersion(1, 3, 2), false),
+        ]
+    )
+    func disablesPlanWorkflow(policy: PermissionPolicy, version: SemanticVersion?, disables: Bool) throws {
+        let adapter = makeAdapter(RecordedProcessRunner(always: .output("")))
+        let arguments = try adapter.makeArguments(
+            prompt: "plan",
+            session: nil,
+            configuration: configuration(policy),
+            version: version
+        )
+        #expect(arguments.contains("--disable-slash-commands") == disables)
+    }
+
     @Test(
         "Permission policies map onto modes",
         arguments: [
@@ -161,6 +185,38 @@ struct AntigravityAdapterTests {
         #expect(payload.status == "SUCCESS")
         #expect(payload.response == "OK\n")
         #expect(payload.makeUsageInfo()?.inputTokens == 15718)
+    }
+
+    /// Since 1.3, a tool that print mode cannot ask about is denied and the
+    /// run ends with an empty reply — still `SUCCESS`, with the denial only in
+    /// `denied_actions`. The caller has to learn that nothing was produced and
+    /// why, not receive an empty answer that looks finished.
+    @Test("A run cut short by a denied tool reports the denial")
+    func reportsDeniedActions() async throws {
+        let runner = RecordedProcessRunner(always: RecordedProcessRunner.Recording(
+            standardOutput: try Fixture.data(Fixture.antigravityDenied),
+            standardError: Data(try Fixture.text(Fixture.antigravityDeniedStandardError).utf8)
+        ))
+        let events = try await makeAdapter(runner).stream("x", configuration: configuration()).allEvents()
+
+        let denials = events.compactMap { event -> String? in
+            if case let .permissionDenied(tool, _) = event { return tool }
+            return nil
+        }
+        #expect(denials == ["RunCommand"])
+
+        let response = try #require(events.compactMap(\.response).first)
+        #expect(response.text.isEmpty)
+        #expect(response.isError)
+        #expect(response.stopReason == "PERMISSION_DENIED")
+
+        struct Record: Decodable { let commitSubject: String }
+        #expect {
+            _ = try response.decode(as: Record.self)
+        } throws: { error in
+            guard case let AgenticCLIError.structuredOutputFailed(reason, _) = error else { return false }
+            return reason.contains("PERMISSION_DENIED")
+        }
     }
 
     @Test("Plain-text output is surfaced as diagnostics, not silently dropped")

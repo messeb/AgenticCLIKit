@@ -38,6 +38,44 @@ struct VibeAdapterTests {
         return home
     }
 
+    /// The session the Unified Harness recordings belong to.
+    private let unifiedSessionID = "66f27779-7144-e4f2-ead6-1e84ca4582b2"
+
+    /// Builds the store layout the Unified Harness (`vibe` 2.26+) writes:
+    /// `logs/session/unified/<id>/CURRENT` naming the live generation, whose
+    /// directory holds the projection and runtime state.
+    private func makeHomeWithUnifiedStore(
+        projection: String = Fixture.vibeUnifiedProjectionAfterRun,
+        experimentCache: Bool = true,
+        configuration: String? = nil
+    ) throws -> URL {
+        let home = URL(fileURLWithPath: NSTemporaryDirectory())
+            .appendingPathComponent("vibe-home-\(UUID().uuidString)", isDirectory: true)
+        let session = home.appendingPathComponent("logs/session/unified/\(unifiedSessionID)", isDirectory: true)
+        let generation = session.appendingPathComponent("generations/0000000000000033", isDirectory: true)
+        try FileManager.default.createDirectory(at: generation, withIntermediateDirectories: true)
+        try Data(#"{"generation":"0000000000000033","session_id":"\#(unifiedSessionID)"}"#.utf8)
+            .write(to: session.appendingPathComponent("CURRENT"))
+        try FileManager.default.copyItem(
+            at: Fixture.url(projection),
+            to: generation.appendingPathComponent("projection-state.json")
+        )
+        try FileManager.default.copyItem(
+            at: Fixture.url(Fixture.vibeUnifiedRuntimeState),
+            to: generation.appendingPathComponent("runtime-state.json")
+        )
+        if experimentCache {
+            try FileManager.default.copyItem(
+                at: Fixture.url(Fixture.vibeExperimentCache),
+                to: home.appendingPathComponent("experiment_eval_cache.json")
+            )
+        }
+        if let configuration {
+            try Data(configuration.utf8).write(to: home.appendingPathComponent("config.toml"))
+        }
+        return home
+    }
+
     // MARK: - Transcript
 
     @Test("Maps a recorded transcript onto events")
@@ -173,6 +211,26 @@ struct VibeAdapterTests {
         #expect(response.text == "3→gamma")
     }
 
+    /// The Unified Harness does not replay the transcript on resume and prints
+    /// no checkpoint: the first line is already the new turn. Waiting for a
+    /// checkpoint would suppress the whole answer.
+    @Test("Emits a resumed turn that arrives without replayed history")
+    func resumeWithoutReplayEmitsTheTurn() async throws {
+        let runner = RecordedProcessRunner(always: try .fixture(Fixture.url(Fixture.vibeUnifiedResume)))
+        let session = SessionReference(
+            cli: .vibe,
+            sessionID: unifiedSessionID,
+            workingDirectory: workingDirectory
+        )
+        let events = try await makeAdapter(runner: runner)
+            .stream(resuming: session, prompt: "Now reply with the third line only.", configuration: configuration())
+            .allEvents()
+
+        let response = try #require(events.last?.response)
+        #expect(response.text == "gamma")
+        #expect(response.session?.sessionID == unifiedSessionID)
+    }
+
     @Test("Refuses a session that belongs to another CLI")
     func rejectsForeignSession() async throws {
         let runner = RecordedProcessRunner(always: .output(""))
@@ -270,6 +328,91 @@ struct VibeAdapterTests {
         // Usage is only readable once the process has exited, so the turn is
         // reported complete from the response rather than from a line of output.
         #expect(events.contains { $0.kind == "turnCompleted" })
+    }
+
+    /// `vibe` 2.26 keeps no per-turn stats and no prices in its store, only the
+    /// session's running token totals and the model it ran on. The default
+    /// model is routed remotely, so its price comes from the experiment cache.
+    @Test("Reads usage and cost out of the Unified Harness store")
+    func reportsUsageFromUnifiedStore() async throws {
+        let runner = RecordedProcessRunner(always: try .fixture(Fixture.url(Fixture.vibeUnifiedStream)))
+        let adapter = makeAdapter(runner: runner, home: try makeHomeWithUnifiedStore())
+        let events = try await adapter
+            .stream("Read notes.txt", configuration: configuration())
+            .allEvents()
+
+        let response = try #require(events.last?.response)
+        #expect(response.text == "beta")
+        let usage = try #require(response.usage)
+        #expect(usage.inputTokens == 13483)
+        #expect(usage.outputTokens == 83)
+        #expect(usage.cachedInputTokens == 12096)
+        #expect(usage.model == "glm-5-3")
+        // (13483 - 12096) × 1.4 + 12096 × 0.26 + 83 × 4.4, per million.
+        let cost = try #require(usage.costUSD)
+        #expect(abs(cost - 0.00545196) < 0.000_001)
+        #expect(events.contains { $0.kind == "turnCompleted" })
+    }
+
+    /// The store only records running totals, so a resumed run's usage is the
+    /// difference between the totals before and after it.
+    @Test("Reports a resumed run's usage as the change in session totals")
+    func resumedUsageIsADelta() throws {
+        let before = Vibe.SessionLog(home: try makeHomeWithUnifiedStore())
+        let after = Vibe.SessionLog(home: try makeHomeWithUnifiedStore(
+            projection: Fixture.vibeUnifiedProjectionAfterResume
+        ))
+
+        let baseline = try #require(before.tokenTotals(forSessionID: unifiedSessionID))
+        let usage = try #require(after.usage(forSessionID: unifiedSessionID, since: baseline))
+        #expect(usage.inputTokens == 20334 - 13483)
+        #expect(usage.outputTokens == 86 - 83)
+        #expect(usage.cachedInputTokens == 18816 - 12096)
+    }
+
+    @Test("Prices a model from config.toml before the experiment cache")
+    func configuredPriceWins() async throws {
+        let configuration = """
+        active_model = ""
+
+        [[models]]
+        name = "zai-glm-5-3"
+        alias = "glm-5-3"
+        input_price = 2.0
+        output_price = 10.0
+        """
+        let log = Vibe.SessionLog(home: try makeHomeWithUnifiedStore(
+            experimentCache: false,
+            configuration: configuration
+        ))
+        let usage = try #require(log.usage(forSessionID: unifiedSessionID, since: nil))
+        // No cached price configured, so cached tokens bill at the input rate.
+        let cost = try #require(usage.costUSD)
+        #expect(abs(cost - (13483 * 2.0 + 83 * 10.0) / 1_000_000) < 0.000_001)
+    }
+
+    @Test("Reports tokens without a cost when the model's price is unknown")
+    func unknownPriceKeepsTokens() throws {
+        let log = Vibe.SessionLog(home: try makeHomeWithUnifiedStore(experimentCache: false))
+        let usage = try #require(log.usage(forSessionID: unifiedSessionID, since: nil))
+        #expect(usage.inputTokens == 13483)
+        #expect(usage.costUSD == nil)
+    }
+
+    /// The Unified Harness counts `--max-turns` per run rather than per
+    /// session, and records no step count — the limit passes through.
+    @Test("Passes --max-turns through when resuming a Unified Harness session")
+    func turnLimitIsVerbatimForUnifiedSessions() throws {
+        let adapter = makeAdapter(
+            runner: RecordedProcessRunner(always: .output("")),
+            home: try makeHomeWithUnifiedStore()
+        )
+        var configuration = configuration()
+        configuration.maximumTurns = 2
+        let session = SessionReference(cli: .vibe, sessionID: unifiedSessionID, workingDirectory: workingDirectory)
+        let arguments = try adapter.makeArguments(prompt: "next", session: session, configuration: configuration)
+        let index = try #require(arguments.firstIndex(of: "--max-turns"))
+        #expect(arguments[index + 1] == "2")
     }
 
     @Test("Runs without usage when no session log was written")

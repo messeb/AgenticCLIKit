@@ -2,7 +2,7 @@ import Foundation
 
 /// Namespace for the Claude Code (`claude`) adapter and its payload types.
 ///
-/// Verified against `claude` 2.1.224.
+/// Verified against `claude` 2.1.296.
 public enum ClaudeCode {
     /// Tools that cannot modify the workspace, used for
     /// ``PermissionPolicy/readOnly``.
