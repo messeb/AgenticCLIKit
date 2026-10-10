@@ -124,11 +124,13 @@ For the one-shot case there is ``AgenticCLIKit/AgenticCLIKit/run(_:tools:using:c
 
 ## Known limits
 
-- **`vibe` will not follow the format under ``PermissionPolicy/planOnly`` or
-  ``PermissionPolicy/readOnly``.** Both map onto its `plan` agent profile, which
-  writes a plan and asks to be taken out of plan mode instead of answering. Use
+- **`vibe` before 2.26 will not follow the format under
+  ``PermissionPolicy/planOnly`` or ``PermissionPolicy/readOnly``.** Both map onto
+  its `plan` agent profile, which on those releases writes a plan and asks to be
+  taken out of plan mode instead of answering. Use
   ``PermissionPolicy/acceptingEdits`` or
-  ``PermissionPolicy/allowingTools(allowed:denied:)`` for a session with tools.
+  ``PermissionPolicy/allowingTools(allowed:denied:)`` there. From 2.26 the Unified
+  Harness answers in the format read-only, like every other CLI.
 - **Tool calls are sequential.** One call per reply, by design: the format stays
   small enough for every provider to enforce, and results come back in an order
   the agent can reason about.

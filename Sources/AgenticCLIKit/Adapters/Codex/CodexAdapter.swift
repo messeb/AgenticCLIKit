@@ -22,15 +22,23 @@ extension Codex {
         /// Host apps routinely point agents at plain folders, so this defaults
         /// to `true`.
         public let allowsNonGitDirectories: Bool
+        /// Where a resumed turn's usage baseline is read from. See ``Codex/Rollout``.
+        let rollout: Rollout
 
+        /// - Parameter home: `$CODEX_HOME`, for reading the rollout log;
+        ///   defaults to the environment's, then `~/.codex`.
         public init(
             runner: (any ProcessRunner)? = nil,
             locator: any ExecutableLocating = LoginShellExecutableLocator(),
-            allowsNonGitDirectories: Bool = true
+            allowsNonGitDirectories: Bool = true,
+            home: URL? = nil
         ) {
             self.runner = runner ?? SubprocessRunner(cli: .codex)
             self.locator = locator
             self.allowsNonGitDirectories = allowsNonGitDirectories
+            self.rollout = Rollout(
+                home: home ?? Rollout.resolvedHome(environment: ProcessInfo.processInfo.environment)
+            )
         }
 
         public var displayName: String { "Codex" }
@@ -243,8 +251,36 @@ extension Codex {
                             configuration: configuration
                         )
                         Log.info(.execution, "codex: \(arguments.count) args, \(Log.redacted(prompt))")
+
+                        // A resumed turn reports the thread's running total,
+                        // so the total before it is the baseline.
+                        let rollout = self.rollout
+                        let baseline = session.flatMap { rollout.totals(forThreadID: $0.sessionID) }
+                        func turnUsage(_ reported: UsageInfo?) -> UsageInfo? {
+                            guard let session, let reported else { return reported }
+                            return rollout.turnUsage(reported: reported, baseline: baseline, threadID: session.sessionID)
+                        }
+
+                        // `turn.completed` is held back until the process has
+                        // exited: only then is the rollout's total final.
+                        var completed: UsageInfo??
                         for try await event in streamEvents(invocation: invocation, translator: translator) {
-                            continuation.yield(event)
+                            switch event {
+                            case let .turnCompleted(usage):
+                                completed = .some(usage)
+                            case let .finished(response):
+                                let usage = turnUsage(response.usage)
+                                if let reported = completed {
+                                    continuation.yield(.turnCompleted(response.usage == nil ? turnUsage(reported) : usage))
+                                    completed = nil
+                                }
+                                continuation.yield(.finished(response.replacingUsage(usage)))
+                            default:
+                                continuation.yield(event)
+                            }
+                        }
+                        if let reported = completed {
+                            continuation.yield(.turnCompleted(turnUsage(reported)))
                         }
                     } catch {
                         failure = error
@@ -348,5 +384,24 @@ extension Codex {
                 return nil
             }
         }
+    }
+}
+
+extension AgentResponse {
+    /// A copy carrying different usage, for adapters that can only correct
+    /// the CLI's figures once the process has exited.
+    func replacingUsage(_ usage: UsageInfo?) -> AgentResponse {
+        AgentResponse(
+            text: text,
+            session: session,
+            usage: usage,
+            exitCode: exitCode,
+            isError: isError,
+            stopReason: stopReason,
+            structuredOutput: structuredOutput,
+            rawOutput: rawOutput,
+            standardError: standardError,
+            duration: duration
+        )
     }
 }

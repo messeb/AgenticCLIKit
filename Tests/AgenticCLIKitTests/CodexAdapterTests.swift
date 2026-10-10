@@ -192,6 +192,76 @@ struct CodexAdapterTests {
         #expect(response.session?.sessionID == session.sessionID)
     }
 
+    // MARK: - Usage on resume
+
+    private let rolloutThreadID = "01a12536-76a1-7ac3-b2dc-a1066634f67c"
+
+    /// A `$CODEX_HOME` whose rollout log holds the thread as it stood before
+    /// the resume, as `codex` lays it out.
+    private func makeHomeWithRollout() throws -> (home: URL, rollout: URL) {
+        let home = URL(fileURLWithPath: NSTemporaryDirectory())
+            .appendingPathComponent("codex-home-\(UUID().uuidString)", isDirectory: true)
+        let day = home.appendingPathComponent("sessions/2026/10/10", isDirectory: true)
+        try FileManager.default.createDirectory(at: day, withIntermediateDirectories: true)
+        let rollout = day.appendingPathComponent("rollout-2026-10-10T11-48-08-\(rolloutThreadID).jsonl")
+        try FileManager.default.copyItem(at: Fixture.url(Fixture.codexRolloutBeforeResume), to: rollout)
+        return (home, rollout)
+    }
+
+    /// `codex` reports a resumed turn's usage as the thread's running total, so a caller summing turns — or just reading one — would bill the
+    /// whole conversation again. The turn is the change in the rollout's total.
+    @Test("A resumed turn reports its own usage, not the thread's running total")
+    func resumedUsageIsTheTurnOnly() async throws {
+        let (home, rollout) = try makeHomeWithRollout()
+        let resumedTurn = try Fixture.data(Fixture.codexRolloutResumedTurn)
+        let stream = try Fixture.data(Fixture.codexResumeCumulative)
+        // The CLI appends the turn's totals to its rollout as it runs.
+        let runner = RecordedProcessRunner { _ in
+            if let handle = try? FileHandle(forWritingTo: rollout) {
+                handle.seekToEndOfFile()
+                handle.write(resumedTurn)
+                try? handle.close()
+            }
+            return RecordedProcessRunner.Recording(standardOutput: stream)
+        }
+        let adapter = Codex.Adapter(runner: runner, locator: FakeExecutableLocator(), home: home)
+        let session = SessionReference(cli: .codex, sessionID: rolloutThreadID, workingDirectory: workingDirectory)
+
+        let events = try await adapter
+            .stream(resuming: session, prompt: "Reply with exactly: OK3", configuration: configuration())
+            .allEvents()
+
+        let response = try #require(events.compactMap(\.response).first)
+        #expect(response.text == "OK3")
+        let usage = try #require(response.usage)
+        #expect(usage.inputTokens == 50623 - 33731)
+        #expect(usage.cachedInputTokens == 46464 - 29824)
+        #expect(usage.outputTokens == 17 - 11)
+
+        let completed = events.compactMap { event -> UsageInfo?? in
+            if case let .turnCompleted(usage) = event { return usage }
+            return nil
+        }
+        #expect(completed.count == 1)
+        #expect(completed.first??.outputTokens == 6)
+    }
+
+    /// Without a rollout that matches, there is no baseline to trust: the
+    /// reported figure passes through rather than being guessed at. (This
+    /// recording's thread is not the one in the rollout.)
+    @Test("Usage that does not match the rollout's total is passed through")
+    func unmatchedUsageIsUntouched() async throws {
+        let (home, _) = try makeHomeWithRollout()
+        let runner = RecordedProcessRunner(always: try .fixture(Fixture.url(Fixture.codexResume)))
+        let adapter = Codex.Adapter(runner: runner, locator: FakeExecutableLocator(), home: home)
+        let session = SessionReference(cli: .codex, sessionID: rolloutThreadID, workingDirectory: workingDirectory)
+
+        let response = try await adapter
+            .resume(session, with: "Reply with exactly: RESUMED", configuration: configuration())
+        #expect(response.usage?.inputTokens == 24820)
+        #expect(response.usage?.outputTokens == 35)
+    }
+
     @Test("Shell commands surface as tool events")
     func mapsCommandExecution() async throws {
         let transcript = """

@@ -201,9 +201,12 @@ struct AgenticKitCommand {
         ])
 
         /// Deterministic rather than random, so the demo's answer can be checked
-        /// against the numbers rather than merely looking plausible.
+        /// against the numbers rather than merely looking plausible. Not
+        /// `hashValue`: Swift seeds it per process, so a city would change
+        /// temperature between runs.
         func call(arguments: Arguments) async throws -> Forecast {
-            Forecast(city: arguments.city, temperature: 60 + abs(arguments.city.hashValue % 40))
+            let seed = arguments.city.lowercased().unicodeScalars.reduce(0) { $0 + Int($1.value) }
+            return Forecast(city: arguments.city, temperature: 60 + seed % 40)
         }
     }
 

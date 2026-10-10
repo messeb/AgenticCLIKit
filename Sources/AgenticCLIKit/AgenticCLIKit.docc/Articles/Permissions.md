@@ -58,7 +58,7 @@ The name carries the warning, in the manner of `unsafeBitCast`. It disables ever
 
 On `vibe`, an `--enabled-tools` list is real enforcement rather than a request: in programmatic mode it disables every tool it does not name. So ``PermissionPolicy/readOnly`` is expressed as an allowlist of the tools that only observe, not as a profile that merely discourages the rest. A tool a later `vibe` release adds is *not* on that list — the safe direction for a list that can go stale.
 
-> Note: On Antigravity, a schema run cannot use plan mode — see <doc:TypedResults>.
+> Note: On Antigravity before 1.3, a schema run cannot use plan mode — see <doc:TypedResults>.
 
 ## The environment is an allowlist too
 

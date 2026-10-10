@@ -20,6 +20,10 @@ extension Antigravity {
         private var sessionID: String?
         private var streamedText = ""
         private var usage: UsageInfo?
+        /// Usage reported by each model step of this run. The result's own
+        /// figure counts the whole conversation, so on a resumed turn it
+        /// includes every earlier one; the steps are the run alone.
+        private var stepUsages: [UsageInfo] = []
         private var result: ResultPayload?
         private var activeToolSteps: [Int: String] = [:]
         private let decoder = JSONDecoder()
@@ -55,7 +59,7 @@ extension Antigravity {
                     return events + [.raw(data)]
                 }
                 result = decoded
-                usage = decoded.makeUsageInfo()
+                usage = runUsage
                 events += decoded.deniedActions.map(\.event)
                 events.append(.turnCompleted(usage))
                 return events
@@ -79,7 +83,7 @@ extension Antigravity {
                     return events + [.raw(data)]
                 }
                 result = decoded
-                usage = decoded.makeUsageInfo()
+                usage = runUsage
                 events += decoded.deniedActions.map(\.event)
                 events.append(.turnCompleted(usage))
                 return events
@@ -105,7 +109,8 @@ extension Antigravity {
             let index = step["step_index"] as? Int ?? -1
 
             if let stepUsage = Self.parseUsage(step["usage"] as? [String: Any]) {
-                usage = stepUsage
+                stepUsages.append(stepUsage)
+                usage = runUsage
             }
 
             switch stepType {
@@ -142,6 +147,16 @@ extension Antigravity {
                     summary: step["text_delta"] as? String
                 ))]
             }
+        }
+
+        /// What this run cost: its steps summed when they reported usage, the
+        /// result's figure otherwise — which is only the run's own on a fresh
+        /// conversation, and the best there is under `--output-format json`.
+        private var runUsage: UsageInfo? {
+            guard !stepUsages.isEmpty else { return result?.makeUsageInfo() }
+            var summed = UsageInfo.combined(stepUsages)
+            summed?.duration = result?.durationSeconds.map { .seconds($0) }
+            return summed
         }
 
         static func parseUsage(_ usage: [String: Any]?) -> UsageInfo? {
@@ -189,7 +204,7 @@ extension Antigravity {
             return AgentResponse(
                 text: text,
                 session: sessionID.map(makeSessionReference),
-                usage: result?.makeUsageInfo() ?? usage,
+                usage: runUsage,
                 exitCode: exit.code,
                 isError: wasCutShort || !exit.isSuccess
                     || (result.map { $0.status.uppercased() != "SUCCESS" } ?? false),

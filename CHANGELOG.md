@@ -6,12 +6,19 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ## [Unreleased]
 
+### Added
+
+- Tool calling. `AgentTool` (typed) and `AgentFunction` (raw JSON) describe a
+  host function; `AgentSession` runs the exchange — the agent asks for a tool,
+  the session runs it and resumes the conversation with the result — until an
+  answer arrives or `maximumToolRounds` is reached. No MCP server, socket, or
+  edit to the user's CLI configuration. Verified live, including a follow-up
+  turn, on all six CLIs, all read-only. `agentickit tools <cli>` runs the worked example.
+
 ### Changed
 
 - Verified against Claude Code 2.1.296, Codex 0.162.1, GitHub Copilot CLI
-  1.0.95, Antigravity 1.3.2, and Mistral Vibe 2.26.1. Grok Build 1.0.50 passes
-  the recorded tests and accepts every flag the adapter passes, but has not had
-  a live run.
+  1.0.95, Antigravity 1.3.2, Mistral Vibe 2.26.1, and Grok Build 1.0.50.
 
 ### Fixed
 
@@ -32,6 +39,17 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   reaches for shell commands and so ended most plan and read-only runs empty.
   From 1.3 those runs pass `--disable-slash-commands`; the mode and sandbox
   still apply.
+- Antigravity 1.3 reports structured output under `stream-json` and, with the
+  `/plan` workflow off, honours a schema in plan mode. From 1.3 schema runs
+  stream and `.planOnly` is no longer refused for them.
+- A resumed turn reported the whole conversation's tokens on Codex and
+  Antigravity: both put the thread's running total where the turn's usage
+  belongs. Codex usage is now the change in the thread total recorded in its
+  rollout log; Antigravity usage is the sum of the run's own model steps. A
+  tool-calling session sums its rounds, so its overcount grew quadratically
+  with their number.
+- The `agentickit tools` demo derived temperatures from `hashValue`, which
+  Swift seeds per process, so the same city changed temperature between runs.
 
 ## [1.3.0] - 2026-08-18
 

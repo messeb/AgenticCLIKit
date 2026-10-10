@@ -269,6 +269,36 @@ struct LiveRunIntegrationTests {
         }
     }
 
+    /// Grok claims cross-directory resume and per-turn usage; both are only
+    /// knowable against the real binary.
+    @Test("Grok runs read-only, reports usage, and resumes elsewhere")
+    func grokRunsAndResumes() async throws {
+        let adapter = Grok.Adapter()
+        try await adapter.verifyReady()
+
+        try await withScratchDirectory { directory in
+            let opening = try await adapter.run(
+                "Reply with exactly: OK",
+                configuration: RunConfiguration(workingDirectory: directory, permissions: .readOnly, timeout: .seconds(180))
+            )
+            #expect(opening.text.contains("OK"))
+            #expect(opening.usage?.inputTokens != nil)
+
+            let session = try #require(opening.session)
+            let resumed = try await adapter.resume(
+                session,
+                with: "Reply with exactly: RESUMED",
+                configuration: RunConfiguration(
+                    workingDirectory: FileManager.default.temporaryDirectory,
+                    permissions: .readOnly,
+                    timeout: .seconds(180)
+                )
+            )
+            #expect(resumed.text.contains("RESUMED"))
+            #expect(resumed.session?.sessionID == session.sessionID)
+        }
+    }
+
     /// Copilot is the only adapter that names the session itself, and the only
     /// one whose read-only mapping is enforced by the CLI rather than
     /// approximated — both are worth checking against the real binary.
@@ -430,7 +460,7 @@ struct StructuredAndAttachmentIntegrationTests {
     /// Every prompting adapter, against the record from the original request.
     @Test(
         "Each CLI enforces the schema and returns a decoded record",
-        arguments: [CLIIdentifier.claudeCode, .codex, .antigravity]
+        arguments: [CLIIdentifier.claudeCode, .codex, .antigravity, .grok]
     )
     func returnsDecodedRecords(cli: CLIIdentifier) async throws {
         let kit = AgenticCLIKit()
@@ -598,13 +628,9 @@ struct ToolCallingIntegrationTests {
         }
     }
 
-    /// Every CLI, against the scenario from the feature request.
-    ///
-    /// `vibe` is asked with ``PermissionPolicy/acceptingEdits`` rather than
-    /// read-only on purpose: its read-only mapping selects the `plan` agent
-    /// profile, which writes a plan instead of answering in any format it is
-    /// given. That is a real limit of that combination, documented in the README
-    /// rather than papered over here.
+    /// Every CLI, against the scenario from the feature request — all of them
+    /// read-only, since a session whose only job is to call the host's tools
+    /// has no business editing anything.
     @Test(
         "Each CLI calls the host's tool and answers from the results",
         arguments: [
@@ -613,7 +639,7 @@ struct ToolCallingIntegrationTests {
             (.copilot, .readOnly),
             (.antigravity, .readOnly),
             (.grok, .readOnly),
-            (.vibe, .acceptingEdits),
+            (.vibe, .readOnly),
         ]
     )
     func callsHostTools(cli: CLIIdentifier, permissions: PermissionPolicy) async throws {
@@ -640,5 +666,37 @@ struct ToolCallingIntegrationTests {
         #expect(response.toolCalls.count >= 3)
         #expect(response.text.contains("Wichita"))
         print("\(cli): \(response.rounds) rounds, \(response.toolCalls.count) calls — \(response.text)")
+    }
+
+    /// A second `respond(to:)` opens with the tool preamble again but has to
+    /// land in the same CLI conversation — the resume path each adapter
+    /// implements its own way. The answer may come from memory or from fresh
+    /// calls; either is fine, as long as it is right and the session held.
+    @Test(
+        "A follow-up continues the same conversation on each CLI",
+        arguments: [CLIIdentifier.claudeCode, .codex, .copilot, .antigravity, .grok, .vibe]
+    )
+    func followUpKeepsTheSession(cli: CLIIdentifier) async throws {
+        let kit = AgenticCLIKit()
+        try await kit.agent(for: cli).verifyReady()
+
+        let directory = FileManager.default.temporaryDirectory
+        let session = AgentSession(
+            kit: kit,
+            cli: cli,
+            workingDirectory: directory,
+            tools: [SecretWeatherTool()],
+            instructions: "Help the person with getting weather information",
+            configuration: RunConfiguration(workingDirectory: directory, permissions: .readOnly, timeout: .seconds(240))
+        )
+
+        let first = try await session.respond(to: "What is the weather in Boston and in Pittsburgh?")
+        #expect(first.toolCalls.contains { $0.tool == "getWeather" })
+        let opened = try #require(await session.session)
+
+        let followUp = try await session.respond(to: "Of the cities I asked about, which one was colder?")
+        #expect(followUp.text.contains("Pittsburgh"))
+        #expect(await session.session?.sessionID == opened.sessionID)
+        print("\(cli) follow-up: \(followUp.rounds) rounds, \(followUp.toolCalls.count) calls — \(followUp.text)")
     }
 }
