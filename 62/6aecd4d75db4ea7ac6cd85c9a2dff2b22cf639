@@ -1,0 +1,67 @@
+Tests/AgenticCLIKitTests/Fixtures/codex-rollout-resumed-turn.jsonl
+  s_747ff89631f14e::t_cd9ee2cb9e7f9b 1
+Tests/AgenticCLIKitTests/IntegrationTests.swift
+  s_747ff89631f14e::t_91107d5a3da97b 272-301,463
+  s_747ff89631f14e::t_48d29d30485d86 670-701
+  s_747ff89631f14e::t_96d280d86a9053 631-633,642
+Sources/AgenticCLIKit/AgenticCLIKit.docc/Articles/TypedResults.md
+  s_747ff89631f14e::t_b37d8d39de2777 59
+Sources/AgenticCLIKit/AgenticCLIKit.docc/Articles/Permissions.md
+  s_747ff89631f14e::t_b37d8d39de2777 61
+Sources/AgenticCLIKit/Adapters/Antigravity/AntigravityAdapter.swift
+  s_747ff89631f14e::t_42b58656f68fb3 245-246,249,282-288,325,328
+  s_747ff89631f14e::t_debd26ac3f7b8b 171-173,237-243,320-322
+Tests/AgenticCLIKitTests/Fixtures.swift
+  s_747ff89631f14e::t_09ccc70d01e363 56-58
+  s_747ff89631f14e::t_2821ace0f908af 38-39
+  s_747ff89631f14e::t_eccf1f693b1c33 40-44
+Tests/AgenticCLIKitTests/Fixtures/codex-rollout-before-resume.jsonl
+  s_747ff89631f14e::t_cd9ee2cb9e7f9b 1-2
+Tests/AgenticCLIKitTests/Fixtures/codex-resume-cumulative.jsonl
+  s_747ff89631f14e::t_cd9ee2cb9e7f9b 1-4
+Sources/agentickit/main.swift
+  s_747ff89631f14e::t_b14a9585575a02 204-206,208-209
+CHANGELOG.md
+  s_747ff89631f14e::t_b37d8d39de2777 9-15,17,42-48,51-52
+  s_747ff89631f14e::t_31ca929f1fbe77 16,21
+  s_747ff89631f14e::t_eea8565e3bfd52 49-50
+Tests/AgenticCLIKitTests/CodexAdapterTests.swift
+  s_747ff89631f14e::t_eccf1f693b1c33 195-210,212-248,252,254-260,263-264
+  s_747ff89631f14e::t_2821ace0f908af 211,249-251,253,261-262
+Tests/AgenticCLIKitTests/Fixtures/antigravity-resume-steps.jsonl
+  s_747ff89631f14e::t_0f31f72b7092e9 1-9
+Sources/AgenticCLIKit/AgenticCLIKit.docc/Articles/ToolCalling.md
+  s_747ff89631f14e::t_4908ade97273d8 127-130,132-133
+Sources/AgenticCLIKit/Adapters/Codex/CodexAdapter.swift
+  s_747ff89631f14e::t_2821ace0f908af 255-256
+  s_747ff89631f14e::t_107a4a704544be 25-26,28-29,33-34,39-41,254,257-266,268-283,389-405
+  s_747ff89631f14e::t_25ff8b70b92c29 406-407
+README.md
+  s_747ff89631f14e::t_4601185af1d295 26,28-29,31,33,35-37,39-40,43,45,47,49-50,52,54-59,61,63,66-70,72-74,77-83,85,87,90,93,95-98,100,102,115-116,121,124,126,128,135-136,154-157,159,162,164-168,170,172,177-181,187,189,191-198,200,202,205-206,209,211,218-222,227,229,231-245,254,258,260-263,265,267-270,272,274,276-280,282,284-286,290,292
+  s_747ff89631f14e::t_31ca929f1fbe77 19
+Sources/AgenticCLIKit/Adapters/Codex/CodexRollout.swift
+  s_747ff89631f14e::t_7ac4c978d2cb4b 1-7,11-18,21-103
+  s_747ff89631f14e::t_2821ace0f908af 8-10,19-20
+Tests/AgenticCLIKitTests/AntigravityAdapterTests.swift
+  s_747ff89631f14e::t_09ccc70d01e363 177-208,323-335
+  s_747ff89631f14e::t_42b58656f68fb3 337,361-377
+  s_747ff89631f14e::t_6618538e302ece 336,338
+Sources/AgenticCLIKit/Adapters/Antigravity/Antigravity.swift
+  s_747ff89631f14e::t_debd26ac3f7b8b 23-26,62,86,112-113,152-161,207
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "626aecd4d75db4ea7ac6cd85c9a2dff2b22cf639",
+  "prompts": {},
+  "sessions": {
+    "s_747ff89631f14e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c4a38331-c618-4845-8feb-3781713282ee",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Sebastian Messingfeld <sebastian@messeb.com>"
+    }
+  }
+}
