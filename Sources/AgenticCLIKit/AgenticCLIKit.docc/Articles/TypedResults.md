@@ -56,7 +56,7 @@ Three details, all found by running the CLIs rather than reading their help:
 
 - **`claude`** takes the schema inline and reports the validated object in a dedicated `structured_output` field as well as in `result`.
 - **`codex`** takes the schema as a *file path*, so schema runs get a scratch directory that is removed when the run ends.
-- **`agy`** fills `structured_output` only in its buffered `json` mode, and returns an **empty response** if a schema is combined with plan mode. The adapter switches to `json` for schema runs and refuses ``PermissionPolicy/planOnly`` with an explanation — use ``PermissionPolicy/readOnly``. Schema runs on that CLI therefore produce no streaming deltas.
+- **`agy`** before 1.3 fills `structured_output` only in its buffered `json` mode, and returns an **empty response** if a schema is combined with plan mode. On those releases the adapter switches to `json` for schema runs and refuses ``PermissionPolicy/planOnly`` with an explanation — use ``PermissionPolicy/readOnly`` — so schema runs produce no streaming deltas. From 1.3 schema runs stream, and plan mode works with a schema.
 
 Decoding prefers the CLI's structured field over the message text. That order matters: `agy` returns prose *and* JSON in its text, so text-first parsing would hand back the prose.
 

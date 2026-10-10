@@ -174,6 +174,38 @@ struct AntigravityAdapterTests {
         #expect(response.usage?.reasoningTokens == 180)
     }
 
+    /// The result's usage counts the whole conversation — a resumed turn
+    /// reports every earlier turn again — while each model step reports its
+    /// own. Their sum is the turn.
+    @Test("A resumed turn reports the usage of its own steps")
+    func resumedUsageComesFromSteps() async throws {
+        let runner = RecordedProcessRunner(
+            always: try .fixture(Fixture.url(Fixture.antigravityResumeSteps))
+        )
+        let session = SessionReference(
+            cli: .antigravity,
+            sessionID: "a27390b9-378f-419f-8c3b-c5fa1f934dbd",
+            workingDirectory: workingDirectory
+        )
+        let events = try await makeAdapter(runner)
+            .stream(resuming: session, prompt: "x", configuration: configuration())
+            .allEvents()
+
+        let response = try #require(events.compactMap(\.response).first)
+        #expect(response.text == "beta")
+        let usage = try #require(response.usage)
+        #expect(usage.inputTokens == 13581 + 14155)
+        #expect(usage.outputTokens == 321 + 53)
+        // `num_turns` counts the conversation too, so it is not the run's.
+        #expect(usage.turns == nil)
+
+        let completed = events.compactMap { event -> UsageInfo?? in
+            if case let .turnCompleted(usage) = event { return usage }
+            return nil
+        }
+        #expect(completed.last??.inputTokens == 27736)
+    }
+
     @Test("Parses the single-object result payload")
     func parsesResultPayload() throws {
         let payload = try JSONDecoder().decode(
@@ -288,6 +320,22 @@ struct AntigravitySchemaTests {
         #expect(arguments.contains("--json-schema"))
     }
 
+    /// From 1.3 a schema run streams too, and `structured_output` arrives in
+    /// the result event. Streaming matters for usage: only the steps carry
+    /// the turn's own tokens.
+    @Test("From agy 1.3 a schema run streams")
+    func schemaStreamsFromVersion13() throws {
+        let arguments = try makeAdapter().makeArguments(
+            prompt: "x",
+            session: nil,
+            configuration: configuration(.readOnly),
+            version: SemanticVersion(1, 3, 2)
+        )
+        let formatIndex = try #require(arguments.firstIndex(of: "--output-format"))
+        #expect(arguments[formatIndex + 1] == "stream-json")
+        #expect(arguments.contains("--json-schema"))
+    }
+
     /// Plan mode plus a schema yields an empty response from the CLI, so the
     /// adapter refuses instead of returning nothing.
     @Test("Plan mode is refused for schema runs, with a reason")
@@ -307,6 +355,23 @@ struct AntigravitySchemaTests {
             #expect(reason.contains(".readOnly"))
         } catch {
             Issue.record("Unexpected error: \(error)")
+        }
+    }
+
+    /// The empty plan document came from the `/plan` workflow. From 1.3 that
+    /// is switched off, and plan mode answers in the schema like any other.
+    @Test("From agy 1.3 a schema run keeps plan mode")
+    func planModeWithSchemaFromVersion13() throws {
+        for policy in [PermissionPolicy.planOnly, .readOnly] {
+            let arguments = try makeAdapter().makeArguments(
+                prompt: "x",
+                session: nil,
+                configuration: configuration(policy),
+                version: SemanticVersion(1, 3, 2)
+            )
+            #expect(arguments.contains("plan"))
+            #expect(arguments.contains("--disable-slash-commands"))
+            #expect(arguments.contains("--json-schema"))
         }
     }
 

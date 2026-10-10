@@ -168,9 +168,9 @@ extension Antigravity {
                         let prepared = try await prepareRun(prompt: prompt, configuration: configuration)
                         workspace = prepared.workspace
 
-                        // Only plan mode depends on the release, so only plan
-                        // mode pays for asking.
-                        let version = Self.usesPlanMode(configuration)
+                        // Only plan mode and schema runs depend on the release,
+                        // so only they pay for asking.
+                        let version = Self.usesPlanMode(configuration) || configuration.outputSchema != nil
                             ? await readVersion(at: try await resolveExecutable())
                             : nil
                         let arguments = try makeArguments(
@@ -234,15 +234,19 @@ extension Antigravity {
                 }
             }
 
-            // `agy` populates `structured_output` only in `json` mode. Under
-            // `stream-json` a schema run comes back with an empty response and
-            // no structured field at all — verified against 1.1.13 — so a schema
-            // forces the buffered format rather than silently returning nothing.
-            let outputFormat = configuration.outputSchema == nil ? "stream-json" : "json"
+            // Before 1.3, `agy` populated `structured_output` only in `json`
+            // mode; under `stream-json` a schema run came back empty — verified
+            // against 1.1.13 — so a schema forces the buffered format there.
+            // From 1.3 the result event carries it, and streaming is preferred:
+            // only the steps report a resumed turn's own usage.
+            let streamsSchema = version.map { $0 >= Self.planWorkflowSince } ?? false
+            let outputFormat = configuration.outputSchema == nil || streamsSchema ? "stream-json" : "json"
             var arguments = ["--print", prompt, "--output-format", outputFormat]
+            // From 1.3 the `/plan` workflow is switched off below, and that
+            // workflow was what turned a schema run in plan mode into a plan.
             let permissions = try permissionArguments(
                 for: configuration.permissions,
-                withOutputSchema: configuration.outputSchema != nil
+                withOutputSchema: configuration.outputSchema != nil && !streamsSchema
             )
             arguments += permissions
             // From 1.3, `--mode plan` expands the `/plan` workflow, which reaches
@@ -275,12 +279,13 @@ extension Antigravity {
             return arguments
         }
 
-        /// - Parameter withOutputSchema: whether this run enforces a schema.
-        ///   It changes the mapping: `agy` in plan mode writes a plan document
-        ///   and returns an *empty* response with no `structured_output` when a
-        ///   schema is also set — verified against 1.1.13. Rather than hand back
-        ///   nothing, plan mode is refused and read-only drops to `--sandbox`,
-        ///   which still denies edits because print mode cannot approve them.
+        /// - Parameter withOutputSchema: whether this run enforces a schema on a
+        ///   release before 1.3. It changes the mapping: `agy` in plan mode
+        ///   writes a plan document and returns an *empty* response with no
+        ///   `structured_output` when a schema is also set — verified against
+        ///   1.1.13. Rather than hand back nothing, plan mode is refused and
+        ///   read-only drops to `--sandbox`, which still denies edits because
+        ///   print mode cannot approve them. From 1.3 the caller passes `false`.
         func permissionArguments(
             for policy: PermissionPolicy,
             withOutputSchema: Bool = false
@@ -312,15 +317,15 @@ extension Antigravity {
             }
         }
 
-        /// The first release verified to route `--mode plan` through `/plan`
-        /// and to accept `--disable-slash-commands`.
+        /// The first release verified to route `--mode plan` through `/plan`,
+        /// to accept `--disable-slash-commands`, and to report structured
+        /// output under `stream-json`.
         static let planWorkflowSince = SemanticVersion(1, 3, 0)
 
-        /// Whether a configuration ends up in `--mode plan`.
+        /// Whether a configuration can end up in `--mode plan`.
         static func usesPlanMode(_ configuration: RunConfiguration) -> Bool {
             switch configuration.permissions {
-            case .planOnly: return true
-            case .readOnly: return configuration.outputSchema == nil
+            case .planOnly, .readOnly: return true
             default: return false
             }
         }

@@ -35,6 +35,13 @@ enum Fixture {
     static let codexStream = "codex-stream.jsonl"
     static let codexResume = "codex-resume.jsonl"
     static let codexSchema = "codex-schema.jsonl"
+    // Recorded from `codex-cli` 0.162.1. Like 0.147 (`codex-resume.jsonl`), it
+    // reports a resumed turn's usage as the thread's running total. The rollout fixtures are the log's
+    // `token_count` lines, verbatim, and nothing else; the resume transcript
+    // drops a warning naming the recording machine's hook files.
+    static let codexResumeCumulative = "codex-resume-cumulative.jsonl"
+    static let codexRolloutBeforeResume = "codex-rollout-before-resume.jsonl"
+    static let codexRolloutResumedTurn = "codex-rollout-resumed-turn.jsonl"
     // Recorded from GitHub Copilot CLI 1.0.80
     static let copilotStream = "copilot-stream.jsonl"
     // Recorded from `agy` 1.0.16
@@ -46,6 +53,9 @@ enum Fixture {
     // for a shell command, which print mode denied.
     static let antigravityDenied = "antigravity-denied.json"
     static let antigravityDeniedStandardError = "antigravity-denied-stderr.txt"
+    // Recorded from `agy` 1.3.2: a resumed turn that read a file, so two
+    // model steps. Paths are replaced.
+    static let antigravityResumeSteps = "antigravity-resume-steps.jsonl"
     // Recorded from `vibe` 2.24.1. Absolute paths and the recording machine's
     // user name are replaced; nothing else is altered. `vibe-meta.json` keeps
     // every field this package reads, verbatim — the CLI's own system prompt and

@@ -83,18 +83,26 @@ extension Grok {
                 // `--json-schema` implies Grok's buffered `json` format. Its
                 // final object has `text`, `sessionId`, and `stopReason`, not a
                 // streaming event discriminator.
-                if let answer = object["text"] as? String {
-                    text = answer
-                    stopReason = object["stopReason"] as? String ?? stopReason
-                    usage = Self.parseUsage(object["usage"] as? [String: Any], model: model) ?? usage
-                    structuredOutput = Data(answer.utf8)
-                    events.append(.assistantMessage(answer))
+                if absorbBufferedResult(object) {
+                    events.append(.assistantMessage(text))
                     if let usage { events.append(.turnCompleted(usage)) }
                 } else {
                     events.append(.raw(data))
                 }
             }
             return events
+        }
+
+        /// Takes the fields of Grok's buffered result object. Returns `false`
+        /// when this is not one.
+        @discardableResult
+        private mutating func absorbBufferedResult(_ object: [String: Any]) -> Bool {
+            guard let answer = object["text"] as? String else { return false }
+            text = answer
+            stopReason = object["stopReason"] as? String ?? stopReason
+            usage = Self.parseUsage(object["usage"] as? [String: Any], model: model) ?? usage
+            structuredOutput = Data(answer.utf8)
+            return true
         }
 
         static func parseUsage(_ value: [String: Any]?, model: String?) -> UsageInfo? {
@@ -121,6 +129,18 @@ extension Grok {
                 throw AgenticCLIError.processFailed(.grok, exitCode: exit.code,
                     standardError: failureMessage ?? standardError)
             }
+
+            // Grok pretty-prints its buffered `json` result across many lines, so
+            // no single line is parseable and nothing reaches the switch above.
+            // Reading the whole of stdout is the only way to see that shape — and
+            // it carries the session ID, without which the conversation cannot be
+            // resumed.
+            if text.isEmpty,
+               let object = (try? JSONSerialization.jsonObject(with: rawOutput)) as? [String: Any] {
+                absorbBufferedResult(object)
+                if let id = object["sessionId"] as? String { sessionID = id }
+            }
+
             return AgentResponse(
                 text: text.trimmingCharacters(in: .whitespacesAndNewlines),
                 session: sessionID.map(sessionReference), usage: usage, exitCode: exit.code,
