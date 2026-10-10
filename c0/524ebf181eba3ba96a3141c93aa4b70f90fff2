@@ -1,0 +1,88 @@
+Tests/AgenticCLIKitTests/Fixtures/vibe-unified-resume.jsonl
+  s_747ff89631f14e::t_5539152caa6e7e 1-2
+Sources/AgenticCLIKit/Adapters/Codex/CodexAdapter.swift
+  s_747ff89631f14e::t_b76d1ad33747fc 15
+Tests/AgenticCLIKitTests/Fixtures/vibe-unified-projection-1.json
+  s_747ff89631f14e::t_5539152caa6e7e 1-58
+Tests/AgenticCLIKitTests/Fixtures/vibe-unified-runtime-state.json
+  s_747ff89631f14e::t_5539152caa6e7e 1-25
+Tests/AgenticCLIKitTests/Fixtures.swift
+  s_747ff89631f14e::t_02f6511f00f099 45-48
+  s_747ff89631f14e::t_cde2d6fd9282f6 58-68
+Sources/AgenticCLIKit/Adapters/Antigravity/Antigravity.swift
+  s_747ff89631f14e::t_e7f7fb40c306c6 59,83,183-187,194-196,245-246,256,268-287
+  s_747ff89631f14e::t_b76d1ad33747fc 5
+Tests/AgenticCLIKitTests/Fixtures/vibe-experiment-cache.json
+  s_747ff89631f14e::t_42a034e94b9e50 1
+Sources/AgenticCLIKit/Adapters/ClaudeCode/ClaudeCode.swift
+  s_747ff89631f14e::t_b76d1ad33747fc 5
+Sources/AgenticCLIKit/Adapters/Copilot/Copilot.swift
+  s_747ff89631f14e::t_b76d1ad33747fc 10
+Sources/AgenticCLIKit/Adapters/Copilot/CopilotAdapter.swift
+  s_747ff89631f14e::t_b76d1ad33747fc 23
+Tests/AgenticCLIKitTests/Fixtures/antigravity-denied-stderr.txt
+  s_747ff89631f14e::t_02f6511f00f099 1
+Tests/AgenticCLIKitTests/IntegrationTests.swift
+  s_747ff89631f14e::t_eaa5169b775eb1 441-442,444-445
+CHANGELOG.md
+  s_747ff89631f14e::t_d2e8dcb4141f60 9-35
+README.md
+  s_747ff89631f14e::t_b76d1ad33747fc 14-18,34-38,91
+Sources/AgenticCLIKit/Adapters/Codex/Codex.swift
+  s_747ff89631f14e::t_b76d1ad33747fc 5
+Tests/AgenticCLIKitTests/Fixtures/antigravity-denied.json
+  s_747ff89631f14e::t_dd4a19265ae0c2 1
+Sources/AgenticCLIKit/Adapters/Vibe/VibeModels.swift
+  s_747ff89631f14e::t_4e55ab256274dc 124-155
+Sources/AgenticCLIKit/AgenticCLIKit.docc/Articles/GettingStarted.md
+  s_747ff89631f14e::t_b76d1ad33747fc 24-25
+Tests/AgenticCLIKitTests/Fixtures/vibe-unified-stream.jsonl
+  s_747ff89631f14e::t_5539152caa6e7e 1-4
+Sources/AgenticCLIKit/Adapters/Vibe/VibeAdapter.swift
+  s_747ff89631f14e::t_f619102c7083d2 342-346
+  s_747ff89631f14e::t_fc4dc486b37fba 230-233,237
+  s_747ff89631f14e::t_a91d7763e8480e 8-9
+Tests/AgenticCLIKitTests/Fixtures/vibe-unified-projection-2.json
+  s_747ff89631f14e::t_5539152caa6e7e 1-58
+Tests/AgenticCLIKitTests/VibeAdapterTests.swift
+  s_747ff89631f14e::t_b785e388755b30 41-78
+  s_747ff89631f14e::t_cf852756a8ff0a 214-233
+  s_747ff89631f14e::t_a182651937e1ea 333-417
+Sources/AgenticCLIKit/Adapters/Vibe/Vibe.swift
+  s_747ff89631f14e::t_f1cbefc378c7d7 115-119
+  s_747ff89631f14e::t_49f0198074457e 187-193
+  s_747ff89631f14e::t_b76d1ad33747fc 24
+Sources/AgenticCLIKit/Adapters/Vibe/VibeSessionLog.swift
+  s_747ff89631f14e::t_15f2da3e4c1faf 11-26,30-35
+  s_747ff89631f14e::t_1253afddfc4dae 90-253,256
+  s_747ff89631f14e::t_ea1d4d691a006c 396,398-399,401-402
+  s_747ff89631f14e::t_30e12dae447d55 257
+Sources/AgenticCLIKit/Core/StructuredOutput.swift
+  s_747ff89631f14e::t_486aed85b54b16 84-89
+Tests/AgenticCLIKitTests/AntigravityAdapterTests.swift
+  s_747ff89631f14e::t_cf451f199f17c9 49-54,56-72
+  s_747ff89631f14e::t_7a6dd7c61e3923 55
+  s_747ff89631f14e::t_0e0e1cca565be4 190-221
+Sources/AgenticCLIKit/Adapters/Antigravity/AntigravityAdapter.swift
+  s_747ff89631f14e::t_b76d1ad33747fc 15
+  s_747ff89631f14e::t_db418184936daf 171-175,180-181,214-215,243,247-256,315-325
+  s_747ff89631f14e::t_f3e6153790f674 326-327
+Sources/AgenticCLIKit/Adapters/ClaudeCode/ClaudeCodeAdapter.swift
+  s_747ff89631f14e::t_b76d1ad33747fc 9
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "c0524ebf181eba3ba96a3141c93aa4b70f90fff2",
+  "prompts": {},
+  "sessions": {
+    "s_747ff89631f14e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c4a38331-c618-4845-8feb-3781713282ee",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Sebastian Messingfeld <sebastian@messeb.com>"
+    }
+  }
+}
