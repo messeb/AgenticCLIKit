@@ -1,0 +1,58 @@
+{
+  "projection_state_version": 1,
+  "session_id": "66f27779-7144-e4f2-ead6-1e84ca4582b2",
+  "snapshot": {
+    "activeCallbacks": [],
+    "format": "harness.public-session-state/v1",
+    "history": {
+      "cursor": {
+        "after": null,
+        "before": null
+      },
+      "entries": [],
+      "range": "latest"
+    },
+    "latestTurn": {
+      "completedAt": 1791594221051,
+      "id": "turn-d7c1feaf747b0ee0df9713cf6d8a9fd5",
+      "inputEntryId": "user-turn-d7c1feaf747b0ee0df9713cf6d8a9fd5-7",
+      "queueItemId": null,
+      "sessionId": "66f27779-7144-e4f2-ead6-1e84ca4582b2",
+      "startedAt": 1791594220578,
+      "status": "completed",
+      "stopReason": null
+    },
+    "session": {
+      "contextUsage": {
+        "cachedInputTokens": 6720,
+        "inputTokens": 6851,
+        "outputTokens": 3,
+        "totalTokens": 6854
+      },
+      "createdAt": 1791594217084,
+      "id": "66f27779-7144-e4f2-ead6-1e84ca4582b2",
+      "parentSessionId": null,
+      "preview": "Read the file /tmp/vibe-fixture/notes.txt and reply with its second line only,\u2026",
+      "rootSessionId": "66f27779-7144-e4f2-ead6-1e84ca4582b2",
+      "status": {
+        "type": "idle"
+      },
+      "title": null,
+      "titleSource": "auto",
+      "tokenUsage": {
+        "cachedInputTokens": 18816,
+        "inputTokens": 20334,
+        "outputTokens": 86,
+        "totalTokens": 20420
+      },
+      "updatedAt": 1791594221051
+    },
+    "turnQueue": {
+      "items": [],
+      "maxItems": 32,
+      "paused": false
+    }
+  },
+  "snapshot_sequence": 33,
+  "watermark": 9
+}

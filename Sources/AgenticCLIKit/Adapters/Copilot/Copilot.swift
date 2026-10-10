@@ -7,7 +7,7 @@ import Foundation
 /// manages repositories — issues, pull requests, releases — takes no prompts,
 /// and is not an agentic CLI, so this package does not wrap it.
 ///
-/// Verified against GitHub Copilot CLI 1.0.80.
+/// Verified against GitHub Copilot CLI 1.0.95.
 public enum Copilot {
     /// Tool-permission patterns, in `copilot`'s own `kind(argument)` grammar.
     ///

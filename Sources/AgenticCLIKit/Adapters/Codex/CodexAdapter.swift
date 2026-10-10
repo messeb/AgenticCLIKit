@@ -12,7 +12,7 @@ extension Codex {
     ///   `codex exec` — notably no `--sandbox` and no `--cd`. The sandbox policy
     ///   is therefore passed as `-c sandbox_mode=…` on the resume path.
     ///
-    /// Verified against `codex-cli` 0.147.0.
+    /// Verified against `codex-cli` 0.162.1.
     public struct Adapter: ProcessBackedCLI {
         public static let identifier = CLIIdentifier.codex
 

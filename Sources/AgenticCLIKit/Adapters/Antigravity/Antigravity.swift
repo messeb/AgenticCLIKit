@@ -2,7 +2,7 @@ import Foundation
 
 /// Namespace for the Antigravity (`agy`) adapter.
 ///
-/// Verified against `agy` 1.1.13. Note that `agy --help` prints a *shorter*
+/// Verified against `agy` 1.3.2. Note that `agy --help` prints a *shorter*
 /// flag list than `agy help`; the structured-output flags this adapter depends
 /// on (`--output-format`, `--mode`) appear only in the latter.
 public enum Antigravity {}
@@ -56,6 +56,7 @@ extension Antigravity {
                 }
                 result = decoded
                 usage = decoded.makeUsageInfo()
+                events += decoded.deniedActions.map(\.event)
                 events.append(.turnCompleted(usage))
                 return events
             }
@@ -79,6 +80,7 @@ extension Antigravity {
                 }
                 result = decoded
                 usage = decoded.makeUsageInfo()
+                events += decoded.deniedActions.map(\.event)
                 events.append(.turnCompleted(usage))
                 return events
 
@@ -178,14 +180,20 @@ extension Antigravity {
             if result == nil, !exit.isSuccess {
                 throw Self.mapFailure(exit: exit, standardError: standardError, session: resumedSession)
             }
+            // Since 1.3, print mode denies a tool it cannot ask about and ends
+            // the turn with nothing — still reporting `SUCCESS`. An empty reply
+            // with denials is that, not a finished answer.
+            let wasCutShort = text.isEmpty && result?.structuredOutput == nil
+                && !(result?.deniedActions.isEmpty ?? true)
 
             return AgentResponse(
                 text: text,
                 session: sessionID.map(makeSessionReference),
                 usage: result?.makeUsageInfo() ?? usage,
                 exitCode: exit.code,
-                isError: !exit.isSuccess || (result.map { $0.status.uppercased() != "SUCCESS" } ?? false),
-                stopReason: result?.status,
+                isError: wasCutShort || !exit.isSuccess
+                    || (result.map { $0.status.uppercased() != "SUCCESS" } ?? false),
+                stopReason: wasCutShort ? "PERMISSION_DENIED" : result?.status,
                 structuredOutput: result?.structuredOutput,
                 rawOutput: rawOutput,
                 standardError: standardError,
@@ -234,6 +242,8 @@ extension Antigravity {
         /// puts prose *and* the JSON in `response`, so parsing the text would
         /// hand back the prose.
         public let structuredOutput: Data?
+        /// Tools print mode refused because it cannot prompt for them (1.3+).
+        public let deniedActions: [DeniedAction]
 
         private enum CodingKeys: String, CodingKey {
             case conversationID = "conversation_id"
@@ -243,6 +253,7 @@ extension Antigravity {
             case numTurns = "num_turns"
             case usage
             case structuredOutput = "structured_output"
+            case deniedActions = "denied_actions"
         }
 
         public init(from decoder: any Decoder) throws {
@@ -254,6 +265,26 @@ extension Antigravity {
             numTurns = try container.decodeIfPresent(Int.self, forKey: .numTurns)
             usage = try container.decodeIfPresent(TokenUsage.self, forKey: .usage)
             structuredOutput = try container.decodeIfPresent(JSONPassthrough.self, forKey: .structuredOutput)?.data
+            deniedActions = (try? container.decodeIfPresent([DeniedAction].self, forKey: .deniedActions)) ?? []
+        }
+
+        /// One `denied_actions` entry: the permission kind (`command`, …) and
+        /// the tool that needed it.
+        public struct DeniedAction: Decodable, Sendable {
+            public let action: String
+            public let displayName: String?
+
+            private enum CodingKeys: String, CodingKey {
+                case action
+                case displayName = "display_name"
+            }
+
+            var event: AgentEvent {
+                .permissionDenied(
+                    tool: displayName ?? action,
+                    reason: "agy print mode cannot ask for the \"\(action)\" permission, so it was denied"
+                )
+            }
         }
 
         public struct TokenUsage: Decodable, Sendable {

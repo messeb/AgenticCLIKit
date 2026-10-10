@@ -42,6 +42,10 @@ enum Fixture {
     static let antigravityStream = "antigravity-stream.jsonl"
     static let antigravityPrint = "antigravity-print.txt"
     static let antigravitySchema = "antigravity-schema.json"
+    // Recorded from `agy` 1.3.2: a read-only schema run whose model reached
+    // for a shell command, which print mode denied.
+    static let antigravityDenied = "antigravity-denied.json"
+    static let antigravityDeniedStandardError = "antigravity-denied-stderr.txt"
     // Recorded from `vibe` 2.24.1. Absolute paths and the recording machine's
     // user name are replaced; nothing else is altered. `vibe-meta.json` keeps
     // every field this package reads, verbatim — the CLI's own system prompt and
@@ -51,4 +55,15 @@ enum Fixture {
     static let vibeResume = "vibe-resume.jsonl"
     static let vibeTurnLimit = "vibe-turn-limit.jsonl"
     static let vibeMeta = "vibe-meta.json"
+    // Recorded from `vibe` 2.26.1, which runs the Unified Harness by default.
+    // Same substitutions as above. The runtime state keeps only the
+    // `session_metadata` this package reads; the projections and the
+    // experiment cache are verbatim. Projection 1 is the store after the fresh
+    // run, projection 2 after resuming it.
+    static let vibeUnifiedStream = "vibe-unified-stream.jsonl"
+    static let vibeUnifiedResume = "vibe-unified-resume.jsonl"
+    static let vibeUnifiedProjectionAfterRun = "vibe-unified-projection-1.json"
+    static let vibeUnifiedProjectionAfterResume = "vibe-unified-projection-2.json"
+    static let vibeUnifiedRuntimeState = "vibe-unified-runtime-state.json"
+    static let vibeExperimentCache = "vibe-experiment-cache.json"
 }

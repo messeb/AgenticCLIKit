@@ -121,6 +121,38 @@ extension Vibe {
             return nil
         }
 
+        /// The rates of the `[[models]]` entry a model alias selects, when it
+        /// names both an input and an output price.
+        static func price(forModel alias: String, fromTOML toml: String) -> SessionLog.Price? {
+            var fields: [String: String] = [:]
+            var insideModelTable = false
+
+            func match() -> SessionLog.Price? {
+                defer { fields = [:] }
+                guard (fields["alias"] ?? fields["name"]) == alias,
+                      let input = fields["input_price"].flatMap(Double.init),
+                      let output = fields["output_price"].flatMap(Double.init)
+                else { return nil }
+                return SessionLog.Price(
+                    input: input,
+                    output: output,
+                    cachedInput: fields["cached_input_price"].flatMap(Double.init)
+                )
+            }
+
+            for rawLine in toml.split(separator: "\n", omittingEmptySubsequences: false) {
+                let line = rawLine.trimmingCharacters(in: .whitespaces)
+                if line.hasPrefix("[") {
+                    if insideModelTable, let price = match() { return price }
+                    insideModelTable = line.hasPrefix("[[models]]")
+                    continue
+                }
+                guard insideModelTable, let (key, value) = keyValue(in: line) else { continue }
+                fields[key] = value
+            }
+            return insideModelTable ? match() : nil
+        }
+
         /// Splits `key = "value"`, ignoring comments and quoting.
         private static func keyValue(in line: String) -> (key: String, value: String)? {
             guard !line.hasPrefix("#"), let equals = line.firstIndex(of: "=") else { return nil }

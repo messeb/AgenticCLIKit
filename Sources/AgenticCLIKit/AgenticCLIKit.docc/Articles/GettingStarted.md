@@ -21,8 +21,8 @@ let kit = AgenticCLIKit()
 let report = await kit.healthReport()
 
 print(report.formattedSummary())
-// ✓ Claude Code 2.1.224 — you@example.com via subscription
-// ✓ Codex 0.147.0 — authenticated via subscription
+// ✓ Claude Code 2.1.296 — you@example.com via subscription
+// ✓ Codex 0.162.1 — authenticated via subscription
 // ✗ Antigravity — not installed
 //     → Install Antigravity from https://antigravity.google, then run `agy install`
 

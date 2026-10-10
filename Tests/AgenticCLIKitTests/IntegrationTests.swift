@@ -438,8 +438,11 @@ struct StructuredAndAttachmentIntegrationTests {
         try await agent.verifyReady()
 
         try await withScratchDirectory { directory in
+            // The change is described in full so no agent reaches for `git`:
+            // `agy` 1.3 ends a read-only run with nothing when it denies one.
             let response = try await agent.run(
-                "Write a git commit message for this change: added a Swift library for driving agentic CLIs.",
+                "Write a git commit message for this change: added a Swift library for driving agentic CLIs. "
+                    + "The description above is the whole change; do not inspect any files or run commands.",
                 returning: CommitMessage.self,
                 configuration: .readOnly(in: directory, timeout: .seconds(240))
             )

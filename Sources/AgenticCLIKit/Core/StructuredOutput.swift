@@ -81,10 +81,12 @@ extension AgentResponse {
         }
 
         guard let json = StructuredOutputExtraction.firstJSONValue(in: text) else {
-            throw AgenticCLIError.structuredOutputFailed(
-                reason: "No JSON object found in the agent's reply",
-                text: text
-            )
+            // An empty, failed run has no reply to search; saying why it ended
+            // beats sending the caller looking for a malformed answer.
+            let reason = text.isEmpty && isError
+                ? "The run ended without a reply (\(stopReason ?? "error"))"
+                : "No JSON object found in the agent's reply"
+            throw AgenticCLIError.structuredOutputFailed(reason: reason, text: text)
         }
 
         do {

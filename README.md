@@ -11,11 +11,11 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/anthropics/claude-code"><img src="https://img.shields.io/badge/Claude_Code-2.1.224-D97757?logo=claude&logoColor=white" alt="Claude Code 2.1.224"></a>
-  <a href="https://github.com/openai/codex"><img src="https://img.shields.io/badge/Codex-0.147.0-412991?logo=openai&logoColor=white" alt="Codex 0.147.0"></a>
-  <a href="https://github.com/github/copilot-cli"><img src="https://img.shields.io/badge/GitHub_Copilot-1.0.80-24292E?logo=githubcopilot&logoColor=white" alt="GitHub Copilot 1.0.80"></a>
-  <a href="https://antigravity.google"><img src="https://img.shields.io/badge/Antigravity-1.1.13-4285F4?logo=googlegemini&logoColor=white" alt="Antigravity 1.1.13"></a>
-  <a href="https://github.com/mistralai/mistral-vibe"><img src="https://img.shields.io/badge/Mistral_Vibe-2.24.1-FA520F?logo=mistralai&logoColor=white" alt="Mistral Vibe 2.24.1"></a>
+  <a href="https://github.com/anthropics/claude-code"><img src="https://img.shields.io/badge/Claude_Code-2.1.296-D97757?logo=claude&logoColor=white" alt="Claude Code 2.1.296"></a>
+  <a href="https://github.com/openai/codex"><img src="https://img.shields.io/badge/Codex-0.162.1-412991?logo=openai&logoColor=white" alt="Codex 0.162.1"></a>
+  <a href="https://github.com/github/copilot-cli"><img src="https://img.shields.io/badge/GitHub_Copilot-1.0.95-24292E?logo=githubcopilot&logoColor=white" alt="GitHub Copilot 1.0.95"></a>
+  <a href="https://antigravity.google"><img src="https://img.shields.io/badge/Antigravity-1.3.2-4285F4?logo=googlegemini&logoColor=white" alt="Antigravity 1.3.2"></a>
+  <a href="https://github.com/mistralai/mistral-vibe"><img src="https://img.shields.io/badge/Mistral_Vibe-2.26.1-FA520F?logo=mistralai&logoColor=white" alt="Mistral Vibe 2.26.1"></a>
   <a href="https://x.ai/cli"><img src="https://img.shields.io/badge/Grok_Build-1.0.5-111111?logo=x&logoColor=white" alt="Grok Build 1.0.5"></a>
 </p>
 
@@ -31,11 +31,11 @@ let kit = AgenticCLIKit()
 // Which agents can actually do work right now?
 let report = await kit.healthReport()
 print(report.formattedSummary())
-// ✓ Claude Code 2.1.224 — sebastian@example.com via subscription
-// ✓ Codex 0.147.0 — authenticated via subscription
-// ✓ GitHub Copilot CLI 1.0.80 — octocat via oauth
-// ✓ Antigravity 1.1.13 — authenticated via keychain
-// ✓ Mistral Vibe 2.24.1 — authenticated via longLivedToken
+// ✓ Claude Code 2.1.296 — sebastian@example.com via subscription
+// ✓ Codex 0.162.1 — authenticated via subscription
+// ✓ GitHub Copilot CLI 1.0.95 — octocat via oauth
+// ✓ Antigravity 1.3.2 — authenticated via keychain
+// ✓ Mistral Vibe 2.26.1 — authenticated via longLivedToken
 
 let response = try await kit.run(
     "Summarise the uncommitted changes",
@@ -88,7 +88,7 @@ Capabilities are declared, not assumed. Ask for something an adapter cannot do f
 | | Claude Code | Codex | Copilot | Antigravity | Vibe | Grok Build |
 |---|---|---|---|---|---|---|
 | Executable | `claude` | `codex` | `copilot` | `agy` | `vibe` | `grok` |
-| Verified against | 2.1.224 | 0.147.0 | 1.0.80 | 1.1.13 | 2.24.1 | 1.0.5 |
+| Verified against | 2.1.296 | 0.162.1 | 1.0.95 | 1.3.2 | 2.26.1 | 1.0.5 |
 | Prompting | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 | Sessions / resume | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 | Resume across directories | ✅ | ✅ | ✅ | ❌ | ✅ | ✅ |

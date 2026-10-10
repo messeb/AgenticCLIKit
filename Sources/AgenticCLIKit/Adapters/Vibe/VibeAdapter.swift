@@ -5,7 +5,8 @@ extension Vibe {
     ///
     /// Marked ``CLICapabilities/experimental``: `vibe` ships roughly weekly and
     /// its programmatic surface is still moving. The flags below are verified
-    /// against 2.24.1.
+    /// against 2.26.1 and 2.24.1 — the two sides of the Unified Harness
+    /// cutover, which changed resume output and the session store.
     ///
     /// What is distinctive here, and what it costs:
     ///
@@ -226,10 +227,14 @@ extension Vibe {
                             additionalDirectories: prepared.additionalDirectories
                         )
                         let sessionLog = self.sessionLog
+                        // The Unified Harness only keeps running totals, so a
+                        // resumed run's usage is measured against the totals
+                        // from before it started.
+                        let baseline = session.flatMap { sessionLog.tokenTotals(forSessionID: $0.sessionID) }
                         let translator = Translator(
                             workingDirectory: configuration.workingDirectory,
                             resumedSession: session,
-                            usageProvider: { sessionLog.usage(forSessionID: $0) }
+                            usageProvider: { sessionLog.usage(forSessionID: $0, since: baseline) }
                         )
                         let invocation = try await makeInvocation(
                             arguments: arguments,
@@ -334,10 +339,11 @@ extension Vibe {
         /// steps never gets a turn. The session's existing step count is read
         /// from its log and added.
         ///
-        /// When there is no log to read — session logging switched off — the
-        /// number is passed through unchanged, because refusing the run over a
-        /// missing convenience would be worse than a limit that is stricter than
-        /// asked for.
+        /// That applies to the legacy harness only. The Unified Harness (2.26+)
+        /// counts per run and records no steps, so there is nothing to add and
+        /// the number passes through — as it does when session logging is off,
+        /// because refusing the run over a missing convenience would be worse
+        /// than a limit that is stricter than asked for.
         func turnLimit(_ maximumTurns: Int, resuming session: SessionReference?) -> Int {
             guard let session else { return maximumTurns }
             guard let steps = sessionLog.steps(forSessionID: session.sessionID) else {

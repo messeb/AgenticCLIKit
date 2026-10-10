@@ -20,7 +20,7 @@ extension Copilot {
     /// - Session export to GitHub web and mobile is switched **off** by default
     ///   here — see ``exportsSessionsToGitHub``.
     ///
-    /// Verified against GitHub Copilot CLI 1.0.80.
+    /// Verified against GitHub Copilot CLI 1.0.95.
     public struct Adapter: ProcessBackedCLI {
         public static let identifier = CLIIdentifier.copilot
 

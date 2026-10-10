@@ -12,7 +12,7 @@ extension Antigravity {
     /// cross-directory resume, so the adapter validates the working directory
     /// rather than assuming it works and producing a confusing failure later.
     ///
-    /// Verified against `agy` 1.1.13.
+    /// Verified against `agy` 1.3.2.
     public struct Adapter: ProcessBackedCLI {
         public static let identifier = CLIIdentifier.antigravity
 
@@ -168,11 +168,17 @@ extension Antigravity {
                         let prepared = try await prepareRun(prompt: prompt, configuration: configuration)
                         workspace = prepared.workspace
 
+                        // Only plan mode depends on the release, so only plan
+                        // mode pays for asking.
+                        let version = Self.usesPlanMode(configuration)
+                            ? await readVersion(at: try await resolveExecutable())
+                            : nil
                         let arguments = try makeArguments(
                             prompt: prepared.prompt,
                             session: session,
                             configuration: configuration,
-                            additionalDirectories: prepared.additionalDirectories
+                            additionalDirectories: prepared.additionalDirectories,
+                            version: version
                         )
                         let translator = Translator(
                             workingDirectory: configuration.workingDirectory,
@@ -205,7 +211,8 @@ extension Antigravity {
             prompt: String,
             session: SessionReference?,
             configuration: RunConfiguration,
-            additionalDirectories: [URL]? = nil
+            additionalDirectories: [URL]? = nil,
+            version: SemanticVersion? = nil
         ) throws -> [String] {
             if configuration.maximumTurns != nil {
                 throw AgenticCLIError.unsupportedCapability(Self.identifier, .turnLimits)
@@ -233,10 +240,20 @@ extension Antigravity {
             // forces the buffered format rather than silently returning nothing.
             let outputFormat = configuration.outputSchema == nil ? "stream-json" : "json"
             var arguments = ["--print", prompt, "--output-format", outputFormat]
-            arguments += try permissionArguments(
+            let permissions = try permissionArguments(
                 for: configuration.permissions,
                 withOutputSchema: configuration.outputSchema != nil
             )
+            arguments += permissions
+            // From 1.3, `--mode plan` expands the `/plan` workflow, which reaches
+            // for shell commands that print mode cannot approve — and a denial
+            // now ends the turn with an empty reply. Without slash-command
+            // expansion the mode and sandbox still apply, minus the workflow.
+            // Older releases are not known to accept the flag, so it waits for
+            // a version that does.
+            if permissions.contains("plan"), let version, version >= Self.planWorkflowSince {
+                arguments.append("--disable-slash-commands")
+            }
 
             if let session {
                 arguments += ["--conversation", session.sessionID]
@@ -292,6 +309,19 @@ extension Antigravity {
                 )
             case .unsafeBypassAll:
                 return ["--dangerously-skip-permissions"]
+            }
+        }
+
+        /// The first release verified to route `--mode plan` through `/plan`
+        /// and to accept `--disable-slash-commands`.
+        static let planWorkflowSince = SemanticVersion(1, 3, 0)
+
+        /// Whether a configuration ends up in `--mode plan`.
+        static func usesPlanMode(_ configuration: RunConfiguration) -> Bool {
+            switch configuration.permissions {
+            case .planOnly: return true
+            case .readOnly: return configuration.outputSchema == nil
+            default: return false
             }
         }
 
