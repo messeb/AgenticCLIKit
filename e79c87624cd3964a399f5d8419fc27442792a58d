@@ -1,0 +1,157 @@
+docs/PRD.md
+  s_721a78f09f800d::t_cc522d4c4d0df5 9-26
+Sources/AgenticCLIKit/Adapters/Antigravity/AntigravityAdapter.swift
+  s_721a78f09f800d::t_eabc25b62f244e 43,81-134
+  s_721a78f09f800d::t_ef6a0bfd37e77f 135
+Sources/agentickit/main.swift
+  s_721a78f09f800d::t_ccaaef96037aa1 41,70,182-186,188-196,198-201,203-205,207-211,214
+  s_721a78f09f800d::t_884d4da3fb8759 197,202,206,212-213
+  s_721a78f09f800d::t_e0ef1a93b0ddd3 187
+  s_721a78f09f800d::t_b80ff4f33254c4 77
+Sources/AgenticCLIKit/Core/AgenticCLI.swift
+  s_721a78f09f800d::t_5d8864a1a91289 37-41
+Sources/AgenticCLIKit/Adapters/Codex/CodexAdapter.swift
+  s_721a78f09f800d::t_8b85191fdbffa7 47,105-174
+  s_721a78f09f800d::t_746ee7e4d04005 175
+Sources/AgenticCLIKit/Core/CLIIdentifier.swift
+  s_721a78f09f800d::t_67e099edd97bad 32
+  s_721a78f09f800d::t_4068a4b1543d81 29-31
+Sources/AgenticCLIKit/AgenticCLIKit.swift
+  s_721a78f09f800d::t_9f44babc16e327 47
+  s_721a78f09f800d::t_4068a4b1543d81 79
+Sources/AgenticCLIKit/Adapters/Copilot/CopilotAdapter.swift
+  s_721a78f09f800d::t_16e6d6b3724e7f 336
+  s_721a78f09f800d::t_15363dfcb1ff11 115-118
+  s_721a78f09f800d::t_0608c5f922e42f 73
+  s_721a78f09f800d::t_937e42134405bf 78-79
+  s_721a78f09f800d::t_e5d6acee4e4cb0 94-112,123-170
+  s_721a78f09f800d::t_fdc78feb7f9f24 1-5,8-35,39-46,49-53,57-72,74-77,80-88,92-93,113-114,119-122,171-175,177,186,214-249,251-335,337-393
+  s_721a78f09f800d::t_4505ad8fe413b8 36-38,47-48,54-56
+  s_721a78f09f800d::t_93f40ba346e689 176,178-185,187,192-193,195-213
+  s_721a78f09f800d::t_0377756447afa3 6-7
+  s_721a78f09f800d::t_79b8f5b5a6e850 89-91
+  s_721a78f09f800d::t_2a16fe0588e846 188-191,194
+  s_721a78f09f800d::t_6b038a8658dc2d 250
+Sources/AgenticCLIKit/Core/Installation.swift
+  s_721a78f09f800d::t_284090cca3bba9 41-45
+README.md
+  s_721a78f09f800d::t_614ba94786a41c 197-234,247,368
+  s_721a78f09f800d::t_e58965f3e9cddb 236-246
+  s_721a78f09f800d::t_436a32c559a344 9,21,54,72,74-87,89,92-94,160,195,235,248
+  s_721a78f09f800d::t_579787719c9814 88
+  s_721a78f09f800d::t_183ad39de7f9c7 196
+Sources/AgenticCLIKit/Adapters/Codex/CodexModels.swift
+  s_721a78f09f800d::t_8c320a5d91ce3b 1-58
+Tests/AgenticCLIKitTests/StructuredOutputTests.swift
+  s_721a78f09f800d::t_0815456f5c6111 245,262-265,270
+Tests/AgenticCLIKitTests/CopilotAdapterTests.swift
+  s_721a78f09f800d::t_a6e30dd2d8ddf4 1-79,84-110,112-230,232-346,420-438
+  s_721a78f09f800d::t_1c9868b564c2b9 347-419
+  s_721a78f09f800d::t_70566870581560 111
+  s_721a78f09f800d::t_1be3f9fdd5c692 80-83
+  s_721a78f09f800d::t_dc2aa39222b0a9 231
+Sources/AgenticCLIKit/Core/CLICapabilities.swift
+  s_721a78f09f800d::t_1d5b18a74f1943 49-51,73
+  s_721a78f09f800d::t_4068a4b1543d81 17
+Sources/AgenticCLIKit/AgenticCLIKit.docc/Articles/Models.md
+  s_721a78f09f800d::t_e58965f3e9cddb 60-62
+  s_721a78f09f800d::t_614ba94786a41c 1-59,65-66
+  s_721a78f09f800d::t_8d2f464251d455 63-64
+Sources/AgenticCLIKit/AgenticCLIKit.docc/Articles/Attachments.md
+  s_721a78f09f800d::t_8d2f464251d455 42
+Sources/AgenticCLIKit/Adapters/ClaudeCode/ClaudeCodeAdapter.swift
+  s_721a78f09f800d::t_5d8864a1a91289 141-145,152-153
+  s_721a78f09f800d::t_8b85191fdbffa7 38,99-140,146-151,154-157
+  s_721a78f09f800d::t_c232a86e9fe6da 158
+Sources/AgenticCLIKit/Core/SemanticVersion.swift
+  s_721a78f09f800d::t_4068a4b1543d81 6
+Tests/AgenticCLIKitTests/Fixtures/copilot-stream.jsonl
+  s_721a78f09f800d::t_e5fce043d46f87 1-38,41-47,50-53
+  s_721a78f09f800d::t_47fc27a48cc155 39-40,48-49
+Sources/AgenticCLIKit/Adapters/Copilot/Copilot.swift
+  s_721a78f09f800d::t_ef5a31d35c8e84 315-317
+  s_721a78f09f800d::t_426b547650b7f5 164-169,179,186-197,199,201-209
+  s_721a78f09f800d::t_548ec074612d11 170,180-184
+  s_721a78f09f800d::t_7c0d74eb804b71 329-337
+  s_721a78f09f800d::t_de99b8ae0e4081 247
+  s_721a78f09f800d::t_65e04cd4d6e5bb 279
+  s_721a78f09f800d::t_d7139730128810 61-62,265,272
+  s_721a78f09f800d::t_d055e039665d31 1-4,9-49,56-57,63-126,131-134,137-149,162-163,171-178,185,198,200,210-246,248-261,275-278,280-308,321-328,338-372
+  s_721a78f09f800d::t_492b65e3b9bb76 150-155
+  s_721a78f09f800d::t_85318beaa5cf29 50-55
+  s_721a78f09f800d::t_3908708dd1d005 264,266-271,273
+  s_721a78f09f800d::t_0377756447afa3 5-8
+  s_721a78f09f800d::t_03349b1547ecec 127-130,135-136
+  s_721a78f09f800d::t_540325686ad03f 262-263,274
+  s_721a78f09f800d::t_3078293b55c3da 156-161
+  s_721a78f09f800d::t_815a0f8d3bd399 58-60
+  s_721a78f09f800d::t_ed700c4b669eb4 309-314,318-320
+Sources/AgenticCLIKit/Core/AgentModel.swift
+  s_721a78f09f800d::t_25e3bdd041b049 1-4,9,15-45,50-63,130-195
+  s_721a78f09f800d::t_1d5b18a74f1943 5-8,10-14
+  s_721a78f09f800d::t_20f98fce98381e 46-49,64-129
+CHANGELOG.md
+  s_721a78f09f800d::t_614ba94786a41c 25-27
+Sources/AgenticCLIKit/AgenticCLIKit.docc/Articles/TypedResults.md
+  s_721a78f09f800d::t_8d2f464251d455 67
+Tests/AgenticCLIKitTests/AttachmentTests.swift
+  s_721a78f09f800d::t_201e8fa8fdf881 352
+  s_721a78f09f800d::t_aaa35209a912bc 423-471
+Sources/AgenticCLIKit/Core/UsageInfo.swift
+  s_721a78f09f800d::t_40316a175ec526 52-53
+  s_721a78f09f800d::t_571d5659620ae9 6
+  s_721a78f09f800d::t_4068a4b1543d81 7-8
+  s_721a78f09f800d::t_12cc056eca2d16 79-80
+  s_721a78f09f800d::t_a34b4fa47b2e09 20-27
+  s_721a78f09f800d::t_20688c37517189 40-41
+  s_721a78f09f800d::t_5756edf793841c 67-68
+  s_721a78f09f800d::t_63231b87722f1b 94-95
+Tests/AgenticCLIKitTests/AgenticCLIKitTests.swift
+  s_721a78f09f800d::t_97a18599aa6f51 41,50-52,55-60,67,71,73,164-165
+Sources/AgenticCLIKitTesting/StubAgent.swift
+  s_721a78f09f800d::t_a573797e298a1d 1-117
+Sources/AgenticCLIKit/AgenticCLIKit.docc/Articles/Sandboxing.md
+  s_721a78f09f800d::t_8d2f464251d455 14
+Sources/AgenticCLIKit/Adapters/ClaudeCode/ClaudeCodeModels.swift
+  s_721a78f09f800d::t_f5cbe500815254 1-84
+Tests/AgenticCLIKitTests/Fixtures.swift
+  s_721a78f09f800d::t_14ac5915edde01 38-39
+Tests/AgenticCLIKitTests/IntegrationTests.swift
+  s_721a78f09f800d::t_aa9bfa4b820c88 271-323
+  s_721a78f09f800d::t_850d5c3b86284c 108-133,136-140
+  s_721a78f09f800d::t_0815456f5c6111 39,141-152
+Tests/AgenticCLIKitTests/AgentModelTests.swift
+  s_721a78f09f800d::t_0815456f5c6111 15,229,247,252-253,256,261
+  s_721a78f09f800d::t_50672b943a4de5 1-14,16-228,230-246,248-251,254-255,257-260,262-263
+Sources/AgenticCLIKit/Adapters/Copilot/CopilotModels.swift
+  s_721a78f09f800d::t_a94140050b1789 6,8-45,47-48,50-51,53-78,80-100,104,110-136,143-163,166-185
+  s_721a78f09f800d::t_e73f6dda5a0b51 1-5,7,46,52,79,101-102,105-109,137-141,164-165,186-187
+  s_721a78f09f800d::t_e72280f1e3d291 49,103,142
+Sources/AgenticCLIKit/Core/AgenticCLIError.swift
+  s_721a78f09f800d::t_6c8f3c4c00c708 23-30,78-79,127,140
+  s_721a78f09f800d::t_32a08593370ba8 128-129
+Sources/AgenticCLIKit/AgenticCLIKit.docc/AgenticCLIKit.md
+  s_721a78f09f800d::t_614ba94786a41c 36-41
+  s_721a78f09f800d::t_8d2f464251d455 3
+  s_721a78f09f800d::t_3e51dc0c7da80b 78
+.github/workflows/cli-compatibility.yml
+  s_721a78f09f800d::t_7c950cb806be45 30,39
+Tests/AgenticCLIKitTests/CoreTypeTests.swift
+  s_721a78f09f800d::t_0815456f5c6111 208-210
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "e79c87624cd3964a399f5d8419fc27442792a58d",
+  "prompts": {},
+  "sessions": {
+    "s_721a78f09f800d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "33d32a87-f1b8-4e0d-ae73-16949135a24e",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Sebastian Messingfeld <sebastian@messeb.com>"
+    }
+  }
+}

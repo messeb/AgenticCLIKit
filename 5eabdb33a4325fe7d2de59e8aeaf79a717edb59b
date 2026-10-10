@@ -1,0 +1,205 @@
+Tests/AgenticCLIKitTests/Fixtures/antigravity-stream.jsonl
+  s_721a78f09f800d::t_6de387760b2d5e 1-7
+Sources/AgenticCLIKit/AgenticCLIKit.docc/Info.plist
+  s_721a78f09f800d::t_bf2bcb5fc2ff38 1-16
+Sources/AgenticCLIKit/Session/FileSessionStore.swift
+  s_721a78f09f800d::t_bf2bcb5fc2ff38 20
+  s_721a78f09f800d::t_e3859788a65b3f 1-19,21-122
+Tests/AgenticCLIKitTests/Fixtures/codex-resume.jsonl
+  s_721a78f09f800d::t_6de387760b2d5e 1-4
+CONTRIBUTORS.md
+  s_721a78f09f800d::t_628555cb8015b5 1-12
+Tests/AgenticCLIKitTests/Fixtures/antigravity-schema.json
+  s_721a78f09f800d::t_04023c12805520 1
+Sources/AgenticCLIKit/AgenticCLIKit.docc/Articles/Sandboxing.md
+  s_721a78f09f800d::t_e1b9475b04b856 1-32
+docs/RELEASING.md
+  s_721a78f09f800d::t_c61c1258141a0a 1-82
+.github/workflows/ci.yml
+  s_721a78f09f800d::t_e3812be054e229 5-61
+  s_721a78f09f800d::t_d712b1645ebf0a 62
+  s_721a78f09f800d::t_01d7e7eb02d0af 1-4
+Sources/AgenticCLIKit/Core/PermissionPolicy.swift
+  s_721a78f09f800d::t_bf2bcb5fc2ff38 10
+  s_721a78f09f800d::t_bbf829bb5e2e54 1-9,11-55
+Tests/AgenticCLIKitTests/Fixtures/claude-stream.jsonl
+  s_721a78f09f800d::t_6de387760b2d5e 2-12
+  s_721a78f09f800d::t_dd2ececa190954 1
+Sources/AgenticCLIKit/AgenticCLIKit.docc/Articles/Attachments.md
+  s_721a78f09f800d::t_416de1e55316b6 1-46
+CHANGELOG.md
+  s_721a78f09f800d::t_628555cb8015b5 1-23
+.github/PULL_REQUEST_TEMPLATE.md
+  s_721a78f09f800d::t_37792ddce0c898 1-33
+Sources/AgenticCLIKit/Version.swift
+  s_721a78f09f800d::t_11337bf34f1725 1-9
+.github/workflows/prepare-release.yml
+  s_721a78f09f800d::t_0e3560ac574f9b 1-112,121-125,127-150
+  s_721a78f09f800d::t_4953b5f885a39b 113-120,126
+.gitignore
+  s_721a78f09f800d::t_be0cca4ce93daf 10-12
+  s_721a78f09f800d::t_d1216efe33de25 1-9,13-41
+.github/DISCUSSION_TEMPLATE/ideas.yml
+  s_721a78f09f800d::t_37792ddce0c898 1-19
+Sources/AgenticCLIKit/AgenticCLIKit.docc/Articles/Sessions.md
+  s_721a78f09f800d::t_e1b9475b04b856 1-42
+README.md
+  s_721a78f09f800d::t_112b97da1e459f 3-363
+SUPPORT.md
+  s_721a78f09f800d::t_628555cb8015b5 1-31
+.github/ISSUE_TEMPLATE/bug_report.yml
+  s_721a78f09f800d::t_37792ddce0c898 1-77
+Sources/AgenticCLIKit/Core/HealthReport.swift
+  s_721a78f09f800d::t_1e74b33384078a 11-89,107
+  s_721a78f09f800d::t_7ec8c9279b8547 1-10,90-106,108
+.github/ISSUE_TEMPLATE/config.yml
+  s_721a78f09f800d::t_37792ddce0c898 1-8
+.github/CODEOWNERS
+  s_721a78f09f800d::t_37792ddce0c898 1-2
+SECURITY.md
+  s_721a78f09f800d::t_628555cb8015b5 1-36
+.github/ISSUE_TEMPLATE/feature_request.yml
+  s_721a78f09f800d::t_37792ddce0c898 1-32
+CONTRIBUTING.md
+  s_721a78f09f800d::t_628555cb8015b5 1-32,38-72
+  s_721a78f09f800d::t_4953b5f885a39b 33-37
+Tests/AgenticCLIKitTests/Fixtures/codex-stream.jsonl
+  s_721a78f09f800d::t_6de387760b2d5e 1-4
+.github/release.yml
+  s_721a78f09f800d::t_37792ddce0c898 1-30
+CODE_OF_CONDUCT.md
+  s_721a78f09f800d::t_628555cb8015b5 1-19
+.github/ISSUE_TEMPLATE/cli_drift.yml
+  s_721a78f09f800d::t_37792ddce0c898 1-45
+Sources/AgenticCLIKit/AgenticCLIKit.docc/AgenticCLIKit.md
+  s_721a78f09f800d::t_d712b1645ebf0a 1-43,45-86
+  s_721a78f09f800d::t_bf2bcb5fc2ff38 44
+.github/dependabot.yml
+  s_721a78f09f800d::t_37792ddce0c898 1-21
+.github/workflows/release.yml
+  s_721a78f09f800d::t_0b351a8f088a6e 1-129
+Sources/AgenticCLIKit/Adapters/GitHub/GitHubAdapter.swift
+  s_721a78f09f800d::t_bf2bcb5fc2ff38 19-125
+  s_721a78f09f800d::t_adeb87d19d588c 1-18,126-198
+.github/copilot-instructions.md
+  s_721a78f09f800d::t_1e74b33384078a 1-52
+.github/workflows/docs.yml
+  s_721a78f09f800d::t_e3812be054e229 1-70
+Sources/AgenticCLIKit/AgenticCLIKit.docc/Articles/TypedResults.md
+  s_721a78f09f800d::t_bf2bcb5fc2ff38 1-71
+Sources/AgenticCLIKit/AgenticCLIKit.docc/Articles/GettingStarted.md
+  s_721a78f09f800d::t_bf2bcb5fc2ff38 84
+  s_721a78f09f800d::t_2adb182b70019a 1-83,85-86
+.github/DISCUSSION_TEMPLATE/announcements.yml
+  s_721a78f09f800d::t_37792ddce0c898 1-12
+Scripts/set-version.sh
+  s_721a78f09f800d::t_11337bf34f1725 1-37
+.github/DISCUSSION_TEMPLATE/q-and-a.yml
+  s_721a78f09f800d::t_37792ddce0c898 1-14
+Tests/AgenticCLIKitTests/Fixtures/codex-schema.jsonl
+  s_721a78f09f800d::t_6de387760b2d5e 1-4
+Sources/AgenticCLIKit/AgenticCLIKit.docc/Articles/Permissions.md
+  s_721a78f09f800d::t_2adb182b70019a 1-58,60-68
+  s_721a78f09f800d::t_bf2bcb5fc2ff38 59
+Sources/AgenticCLIKit/AgenticCLIKit.docc/Articles/WritingAnAdapter.md
+  s_721a78f09f800d::t_e1b9475b04b856 1-76
+Sources/AgenticCLIKit/Core/CLICapabilities.swift
+  s_721a78f09f800d::t_bf2bcb5fc2ff38 31
+  s_721a78f09f800d::t_30bb9538c8e4b1 1-30,32-77
+.editorconfig
+  s_721a78f09f800d::t_b387c180f377b3 1-16
+.gitattributes
+  s_721a78f09f800d::t_4b68fc8b2b36d8 1-27
+.spi.yml
+  s_721a78f09f800d::t_1d93afc9ca582e 1-8
+Sources/AgenticCLIKit/Adapters/Antigravity/Antigravity.swift
+  s_721a78f09f800d::t_215c8c6e166307 1-287
+Sources/AgenticCLIKit/Adapters/Antigravity/AntigravityAdapter.swift
+  s_721a78f09f800d::t_d1ec7d9872b9b2 1-249
+Sources/AgenticCLIKit/Adapters/ClaudeCode/ClaudeCode.swift
+  s_721a78f09f800d::t_ecd7e0a4ccc236 1-162
+Sources/AgenticCLIKit/Adapters/ClaudeCode/ClaudeCodeAdapter.swift
+  s_721a78f09f800d::t_a0d9148381d4cc 1-246
+Sources/AgenticCLIKit/Adapters/ClaudeCode/ClaudeCodeTranslator.swift
+  s_721a78f09f800d::t_57bd5b73351ad8 1-256
+Sources/AgenticCLIKit/Adapters/Codex/CodexAdapter.swift
+  s_721a78f09f800d::t_5e3fd1515c3eca 1-281
+Sources/AgenticCLIKit/AgenticCLIKit.swift
+  s_721a78f09f800d::t_78a9719a0929a9 1-247
+Sources/AgenticCLIKit/Core/AgentEvent.swift
+  s_721a78f09f800d::t_bbc7ab56e68687 1-150
+Sources/AgenticCLIKit/Core/AgentResponse.swift
+  s_721a78f09f800d::t_82ae5b6a34e8d5 1-61
+Sources/AgenticCLIKit/Core/AgenticCLI.swift
+  s_721a78f09f800d::t_2dd00186b05ce0 1-141
+Sources/AgenticCLIKit/Core/AgenticCLIError.swift
+  s_721a78f09f800d::t_a5598f14226c7d 1-147
+Sources/AgenticCLIKit/Core/JSONPassthrough.swift
+  s_721a78f09f800d::t_583893b3b22448 1-76
+Sources/AgenticCLIKit/Core/JSONSchema.swift
+  s_721a78f09f800d::t_09b9fc3bdd9e2d 1-147
+Sources/AgenticCLIKit/Core/Log.swift
+  s_721a78f09f800d::t_989c45b8f8eece 1-96
+Sources/AgenticCLIKit/Core/ProcessBackedCLI.swift
+  s_721a78f09f800d::t_d9596cd51e62bb 1-319
+Sources/AgenticCLIKit/Core/PromptAttachment.swift
+  s_721a78f09f800d::t_ac80dece5d36a1 1-131
+Sources/AgenticCLIKit/Core/RunConfiguration.swift
+  s_721a78f09f800d::t_836de595d6a957 1-98
+Sources/AgenticCLIKit/Core/SemanticVersion.swift
+  s_721a78f09f800d::t_3ffee7ce9c222c 1-121
+Sources/AgenticCLIKit/Process/ProcessRunner.swift
+  s_721a78f09f800d::t_3e1df1d2af9eeb 1-189
+Sources/AgenticCLIKit/Process/RunWorkspace.swift
+  s_721a78f09f800d::t_cc09fb2fe3b21b 1-207
+Sources/AgenticCLIKit/Process/SubprocessRunner.swift
+  s_721a78f09f800d::t_320259d81c7e6a 1-314
+Sources/agentickit/main.swift
+  s_721a78f09f800d::t_156d3cd39e2fe0 1-335
+Tests/AgenticCLIKitTests/AgenticCLIKitTests.swift
+  s_721a78f09f800d::t_1a82dc230d21ba 1-233
+Tests/AgenticCLIKitTests/AntigravityAdapterTests.swift
+  s_721a78f09f800d::t_7cf36cd540491c 1-284
+Tests/AgenticCLIKitTests/AttachmentTests.swift
+  s_721a78f09f800d::t_97ceb9b264641f 1-425
+Tests/AgenticCLIKitTests/ClaudeCodeAdapterTests.swift
+  s_721a78f09f800d::t_5fac78c413e251 1-327
+Tests/AgenticCLIKitTests/CoreTypeTests.swift
+  s_721a78f09f800d::t_e25a63d76f950a 1-214
+Tests/AgenticCLIKitTests/Fixtures.swift
+  s_721a78f09f800d::t_375855e76fea42 1-43
+Tests/AgenticCLIKitTests/Fixtures/antigravity-print.txt
+  s_721a78f09f800d::t_796ea692f367a9 1
+Tests/AgenticCLIKitTests/Fixtures/antigravity-result.json
+  s_721a78f09f800d::t_17603d6483f55f 1
+Tests/AgenticCLIKitTests/Fixtures/claude-result.json
+  s_721a78f09f800d::t_2e908d1df2298c 1
+Tests/AgenticCLIKitTests/Fixtures/claude-schema.json
+  s_721a78f09f800d::t_03a33de71b3d6b 1
+Tests/AgenticCLIKitTests/IntegrationTests.swift
+  s_721a78f09f800d::t_beb94d59986be5 1-427
+Tests/AgenticCLIKitTests/StructuredOutputTests.swift
+  s_721a78f09f800d::t_eed0c7cf6df5f6 1-329
+Tests/AgenticCLIKitTests/SubprocessRunnerTests.swift
+  s_721a78f09f800d::t_35ed4f428a7779 1-331
+docs/PRD.md
+  s_721a78f09f800d::t_a9156f6b728b7e 1-293
+LICENSE
+  s_721a78f09f800d::t_9df38769c2ef38 1-21
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "5eabdb33a4325fe7d2de59e8aeaf79a717edb59b",
+  "prompts": {},
+  "sessions": {
+    "s_721a78f09f800d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "33d32a87-f1b8-4e0d-ae73-16949135a24e",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Sebastian Messingfeld <sebastian@messeb.com>"
+    }
+  }
+}

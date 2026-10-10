@@ -1,0 +1,19 @@
+README.md
+  s_f5b0a34ff7124d::t_3a60aeb8f2af26 88-106,110,128
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "fb325fb78df5eceebd1ce63f9bded6bad0286a35",
+  "prompts": {},
+  "sessions": {
+    "s_f5b0a34ff7124d": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0160a-ea3c-7f40-91aa-bf4295683865",
+        "model": "gpt-5.6-terra"
+      },
+      "human_author": null
+    }
+  }
+}

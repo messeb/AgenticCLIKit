@@ -1,0 +1,68 @@
+Sources/AgenticCLIKit/Adapters/Grok/Grok.swift
+  s_287548d5a32f4a::t_1217084d7f4865 86-87
+  s_287548d5a32f4a::t_200b8761090539 96-107
+  s_287548d5a32f4a::t_c80f6c8f13fb51 132-143
+Sources/AgenticCLIKit/Functions/AgentFunction.swift
+  s_287548d5a32f4a::t_6870d53eb9878b 1-46,48-143
+  s_287548d5a32f4a::t_6bcf3fd76d8422 47
+Sources/agentickit/main.swift
+  s_287548d5a32f4a::t_cab6f1ea61b20f 42
+  s_287548d5a32f4a::t_e7eb3320a93a03 184-238
+  s_287548d5a32f4a::t_bfd0159b08bf32 71
+Sources/AgenticCLIKit/Functions/AgentSession.swift
+  s_287548d5a32f4a::t_4eb08146d40272 1-289
+Tests/AgenticCLIKitTests/IntegrationTests.swift
+  s_287548d5a32f4a::t_e4260fd37dc9b7 563-641
+Sources/AgenticCLIKitTesting/ScriptedAgent.swift
+  s_287548d5a32f4a::t_0517113c140775 1-128,130-171
+  s_287548d5a32f4a::t_6ad0ec8b1122e7 129
+Tests/AgenticCLIKitTests/ToolCallingTests.swift
+  s_287548d5a32f4a::t_5c3bd89849eed4 1-449
+Tests/AgenticCLIKitTests/GrokAdapterTests.swift
+  s_287548d5a32f4a::t_a2be764cc440de 76-108
+Sources/AgenticCLIKit/Functions/AgentTool.swift
+  s_287548d5a32f4a::t_2eebe673cac31a 1-4,10-29,31-39,41-42,47,49,52,54-55,58,62-69,72-82,85-89,91
+  s_287548d5a32f4a::t_292d46d85fc9b3 5-9,30,40,43-46,48,50-51,53,56-57,59-61,70-71,83-84,90
+Sources/AgenticCLIKit/Functions/ToolCallFormat.swift
+  s_287548d5a32f4a::t_d8f54a83cc8a20 1-13,15-31,47-51,58-99,102,106,108-130,133-162,168,173-180,182-186,194-195,222-276
+  s_287548d5a32f4a::t_0db8cb085a473f 14
+  s_287548d5a32f4a::t_c0e389e4af53b4 32-46,52-57
+  s_287548d5a32f4a::t_a9fea1ac5c6aba 131-132
+  s_287548d5a32f4a::t_cf305e3e2bedd7 100-101,103-105,107
+  s_287548d5a32f4a::t_2a19729eb7030b 163-167,169-172,181,188-193
+  s_287548d5a32f4a::t_12e57f8e380e41 196-221
+  s_287548d5a32f4a::t_48dddef6eca360 187
+Sources/AgenticCLIKit/Core/AgenticCLIError.swift
+  s_287548d5a32f4a::t_00aafaf004e5bc 51-57
+  s_287548d5a32f4a::t_772af611c63dec 109-115
+  s_287548d5a32f4a::t_52dea2bd8586bb 165-166
+  s_287548d5a32f4a::t_09965dfdb45348 158-159
+  s_287548d5a32f4a::t_01d31a292165d1 139
+README.md
+  s_287548d5a32f4a::t_78148e5ea83053 455
+  s_287548d5a32f4a::t_eb09cd8a9893ec 492-493
+  s_287548d5a32f4a::t_5575552fafb155 189-252
+  s_287548d5a32f4a::t_65189ba60bde94 100
+Sources/AgenticCLIKit/AgenticCLIKit.docc/AgenticCLIKit.md
+  s_287548d5a32f4a::t_7720f39f1f0a6a 55-64
+CHANGELOG.md
+  s_287548d5a32f4a::t_c8efedd8e39efd 9-38
+Sources/AgenticCLIKit/AgenticCLIKit.docc/Articles/ToolCalling.md
+  s_287548d5a32f4a::t_825ff983c3a72f 1-138
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "47faedbebe10ae352ab187bac6cf46737aa5e3d1",
+  "prompts": {},
+  "sessions": {
+    "s_287548d5a32f4a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "2e8ba568-ee40-48cd-8fab-3b67850cf39c",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Sebastian Messingfeld <sebastian@messeb.com>"
+    }
+  }
+}

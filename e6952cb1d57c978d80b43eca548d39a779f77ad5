@@ -1,0 +1,37 @@
+Sources/AgenticCLIKit/Core/JSONPassthrough.swift
+  s_287548d5a32f4a::t_7a49ccb35b4980 34-55,61-64
+  s_287548d5a32f4a::t_ef479f1800bde0 56-60
+Sources/AgenticCLIKit/Adapters/Copilot/Copilot.swift
+  s_287548d5a32f4a::t_f910d98349b429 196
+  s_287548d5a32f4a::t_dd210df1ec16f6 188-191
+Sources/AgenticCLIKit/Adapters/Antigravity/Antigravity.swift
+  s_287548d5a32f4a::t_90bff6fd753614 75
+Sources/AgenticCLIKit/Adapters/ClaudeCode/ClaudeCodeTranslator.swift
+  s_287548d5a32f4a::t_adb1f0d3cf6fcf 155-158
+Tests/AgenticCLIKitTests/VibeAdapterTests.swift
+  s_287548d5a32f4a::t_1682b89709413b 87-145
+Tests/AgenticCLIKitTests/CoreTypeTests.swift
+  s_287548d5a32f4a::t_db253a7a2e345f 215-244
+Sources/AgenticCLIKit/Adapters/Vibe/Vibe.swift
+  s_287548d5a32f4a::t_b982a6ac42bcd9 237-241
+  s_287548d5a32f4a::t_53bbc0267761e3 252-254
+CHANGELOG.md
+  s_287548d5a32f4a::t_268f6637fb69d6 16
+  s_287548d5a32f4a::t_6198fdae3402d4 9-15
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "e6952cb1d57c978d80b43eca548d39a779f77ad5",
+  "prompts": {},
+  "sessions": {
+    "s_287548d5a32f4a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "2e8ba568-ee40-48cd-8fab-3b67850cf39c",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Sebastian Messingfeld <sebastian@messeb.com>"
+    }
+  }
+}

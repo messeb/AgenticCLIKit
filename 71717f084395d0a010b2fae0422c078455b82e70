@@ -1,0 +1,98 @@
+Sources/AgenticCLIKit/Adapters/Vibe/VibeSessionLog.swift
+  s_287548d5a32f4a::t_c8738ed3d16c18 1-18,22-237
+  s_287548d5a32f4a::t_80c5f041147790 19-21
+Sources/AgenticCLIKit/AgenticCLIKit.swift
+  s_287548d5a32f4a::t_5b5d608a155248 49
+Sources/agentickit/main.swift
+  s_287548d5a32f4a::t_9cb3666a498d33 77
+Tests/AgenticCLIKitTests/Fixtures.swift
+  s_287548d5a32f4a::t_7c63f789de1263 45-53
+Sources/AgenticCLIKit/AgenticCLIKit.docc/Articles/Models.md
+  s_287548d5a32f4a::t_754dd156f3e352 64-65
+  s_287548d5a32f4a::t_05617c165c5b05 26,31-32
+  s_287548d5a32f4a::t_7645071faefe0a 46-52
+Sources/AgenticCLIKit/Adapters/Vibe/VibeModels.swift
+  s_287548d5a32f4a::t_460658e1341cd0 1-136
+Tests/AgenticCLIKitTests/Fixtures/vibe-resume.jsonl
+  s_287548d5a32f4a::t_827c6f15613782 1-9
+Tests/AgenticCLIKitTests/Fixtures/vibe-stream.jsonl
+  s_287548d5a32f4a::t_827c6f15613782 1-5
+CHANGELOG.md
+  s_287548d5a32f4a::t_2555651857700e 9-23
+Sources/AgenticCLIKit/Adapters/Antigravity/Antigravity.swift
+  s_287548d5a32f4a::t_d9ac57150dea66 5
+Sources/AgenticCLIKit/Adapters/Antigravity/AntigravityAdapter.swift
+  s_287548d5a32f4a::t_d9ac57150dea66 15
+Sources/AgenticCLIKit/Adapters/Vibe/VibeAdapter.swift
+  s_287548d5a32f4a::t_d229d57c830f7e 382-391
+  s_287548d5a32f4a::t_dbd2f64614ee3b 1-263,267-293,295-367,369-381,392-424
+  s_287548d5a32f4a::t_7f250469b80101 264-266
+  s_287548d5a32f4a::t_f1431f989047e4 368
+  s_287548d5a32f4a::t_a6ff8dfd7b4502 294
+Tests/AgenticCLIKitTests/AgentModelTests.swift
+  s_287548d5a32f4a::t_f7d7ebf3842def 261
+Sources/AgenticCLIKit/AgenticCLIKit.docc/Articles/Permissions.md
+  s_287548d5a32f4a::t_28864818ecc125 30
+  s_287548d5a32f4a::t_8fe352c2ee8628 52-59
+Tests/AgenticCLIKitTests/VibeAdapterTests.swift
+  s_287548d5a32f4a::t_f5b5553f9e4844 1-478
+Tests/AgenticCLIKitTests/AgenticCLIKitTests.swift
+  s_287548d5a32f4a::t_0716c8ce7fed34 35,38,43
+  s_287548d5a32f4a::t_b4a07834da2f04 56,59-60,62
+Tests/AgenticCLIKitTests/IntegrationTests.swift
+  s_287548d5a32f4a::t_34075df0fd1c15 49
+  s_287548d5a32f4a::t_513598244eba0f 341-387
+  s_287548d5a32f4a::t_a0fa5c9ef09b97 53,62-63
+  s_287548d5a32f4a::t_aea1f57a8f5e03 29,40
+Sources/AgenticCLIKit/Adapters/Vibe/Vibe.swift
+  s_287548d5a32f4a::t_220156a930ee69 1-17,19,21-297,306-314,318-361
+  s_287548d5a32f4a::t_f36a3b27110f46 18,20
+  s_287548d5a32f4a::t_33b3cfb82c0608 298-305
+  s_287548d5a32f4a::t_3c33ebf317160e 315-317
+Tests/AgenticCLIKitTests/Fixtures/vibe-meta.json
+  s_287548d5a32f4a::t_827c6f15613782 1-8,10-38
+  s_287548d5a32f4a::t_ec3c3e2fbce6d3 9
+Sources/AgenticCLIKit/AgenticCLIKit.docc/AgenticCLIKit.md
+  s_287548d5a32f4a::t_87efdcd3d54728 3
+  s_287548d5a32f4a::t_807b61637904cc 80
+Sources/AgenticCLIKit/AgenticCLIKit.docc/Articles/Sessions.md
+  s_287548d5a32f4a::t_0a5c961becceab 31-33
+Tests/AgenticCLIKitTests/Fixtures/vibe-turn-limit.jsonl
+  s_287548d5a32f4a::t_bd52085edeff4a 1-6
+README.md
+  s_287548d5a32f4a::t_0b9354430f2f1d 87-89,91-105,109
+  s_287548d5a32f4a::t_bc03f2bf3f8729 236
+  s_287548d5a32f4a::t_9fc41633fa92ac 127
+  s_287548d5a32f4a::t_e1656f368b12b4 23,25
+  s_287548d5a32f4a::t_f272a2686b87d1 177
+  s_287548d5a32f4a::t_3f7b1f4cb5fa71 241-242
+  s_287548d5a32f4a::t_ca8abe3100d76a 418
+  s_287548d5a32f4a::t_a61e89aa303f53 13-21
+  s_287548d5a32f4a::t_1c35ae93fd44b9 90
+  s_287548d5a32f4a::t_fb6482040bd090 145
+  s_287548d5a32f4a::t_958303b22ddba0 131-138
+  s_287548d5a32f4a::t_eb3e95c5275b28 265-266
+  s_287548d5a32f4a::t_54882da06fa898 247
+  s_287548d5a32f4a::t_a111c8651933d7 287
+  s_287548d5a32f4a::t_9827f4d24d4894 37
+  s_287548d5a32f4a::t_cfefa6d61cc31b 422-424
+  s_287548d5a32f4a::t_21960f2e9e266d 22
+.github/workflows/cli-compatibility.yml
+  s_287548d5a32f4a::t_b588c35a70f586 31-33,42
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "71717f084395d0a010b2fae0422c078455b82e70",
+  "prompts": {},
+  "sessions": {
+    "s_287548d5a32f4a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "2e8ba568-ee40-48cd-8fab-3b67850cf39c",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Sebastian Messingfeld <sebastian@messeb.com>"
+    }
+  }
+}
